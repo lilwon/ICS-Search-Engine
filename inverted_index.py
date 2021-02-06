@@ -19,6 +19,17 @@ def inverted_index():
   
   index_dict = defaultdict(dict)
   
+  for root, dirs, files in os.walk("./DEV"):
+    for doc in files:
+      doc_name = os.path.join(root,name)
+      
+      with open(doc_name, "r") as opened:
+        content = opened.read() # will get an error using BeautifulSoup 
+        parsed_file = BeautifulSoup(content, "html.parser")
+        
+        # tokenize that bitch 
+        
+        
   
   
 
