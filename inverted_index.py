@@ -11,4 +11,12 @@ Verify which are the relevant HTML tags to select the important words.
 
 """
 
+from collections import defaultdict 
+
+
+
+def inverted_index():
+  
+  index_dict = defaultdict(dict)
+  
 
