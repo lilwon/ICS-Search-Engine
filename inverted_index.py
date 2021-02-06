@@ -10,7 +10,7 @@ Create an inverted index for the corpus with data structures designed by you.
 Verify which are the relevant HTML tags to select the important words.
 
 """
-import os
+import os # https://www.tutorialspoint.com/python/os_walk.htm
 from collections import defaultdict 
 
 
@@ -18,5 +18,7 @@ from collections import defaultdict
 def inverted_index():
   
   index_dict = defaultdict(dict)
+  
+  
   
 
