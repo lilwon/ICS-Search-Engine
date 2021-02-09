@@ -28,7 +28,12 @@ def inverted_index():
         content = opened.read() # will get an error using BeautifulSoup 
         parsed_file = BeautifulSoup(content, "html.parser")
         
-        token_expression = '([1-9]\d*(.\d+)?)|\w+' # allow all alphanumeric characters, but if its a number, it will allow a decimal, but only if there is a number after it
+        token_expression = r'([1-9]\d*(.\d+)?)|\w+' # allow all alphanumeric characters, but if its a number, it will allow a decimal, but only if there is a number after it
+        
+        tokenize = RegexpTokenizer(token_expression)
+        
+        #need to read file one at a time 
+        
         
           
           
