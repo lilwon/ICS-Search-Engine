@@ -19,7 +19,7 @@ from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alp
 def inverted_index():
   
   index_dict = defaultdict(dict)
-  
+  tokens_list = [] # list for all the tokens that are found using tokenizer + soup.find_all (hw2) 
   for root, dirs, files in os.walk("./DEV"):
     for doc in files:
       doc_name = os.path.join(root,name)
