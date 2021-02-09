@@ -16,6 +16,17 @@ from collections import defaultdict # when we find doc/term frequency.
 from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
 from bs4 import BeautifulSoup
 
+# Added lowercase because we want unique words... 
+# The -> the 
+# makes it easier to find all words that are the same for the indexer for now
+def lowercase(text):
+  lower_text = ""
+
+  for word in text:
+    lower_text += word.lower()
+
+  return lower_text
+
 
 def inverted_index(): 
   # Your index should be stored in one or more files in the file system (no databases!). <<- from instructions 
@@ -43,13 +54,32 @@ def inverted_index():
 
         words = ' '.join(parsed_file.stripped_strings) # words is one long string
 
+        # lower all the words
+        words = lowercase(words)
+
+        # CURRENTLY USING URLS FOR ALL DOC IDS
+        # CAN CHANGE THIS LATER
+        for token in tokenize(words):
+          # if the word is not in the index, add the doc_id + init frequency (1)
+          if token not in index_dict:
+            index_dict[token][json_fields['url']] = 1
+
+          # Token is already in index, but we need to add NEW doc_id + init frequency(1) 
+          elif token not in index_dict and json_fields['url'] not in index_dict[token]:
+            index_dict[token][json_fields['url']] = 1
+
+          # Increase the frequency if token and doc_id is in the index 
+          elif token in index_dict and json_fields['url'] in index_dict[token]:
+            index_dict[token][json_fields['url']] += 1
+
+        '''
         for token in tokenize(words):
           if token in index_dict and doc_name in index_dict[token]:
             index_dict[token][doc_name] +=1 
           elif token in index_dict:
             index_dict[token][doc_name] = 1 
-            
-            
+        '''    
+        
         with open("inverted_index.txt","w") as report:
           for key, val in index_dict:
            report.write(key + " --> " + val) 
