@@ -33,33 +33,23 @@ def inverted_index():
         parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
         
         token_expression = r'^([1-9]\d*(.\d+)?)|\w+' # allow all alphanumeric characters, but if its a number, it will allow a decimal, but only if there is a number after it
-        
+
+        #token_expression = r'\w+|\$[\d\.]+\S+|\d*\.d+\)' # Lillian's regex from https://www.kite.com/python/docs/nltk.RegexpTokenizer
         tokenize = RegexpTokenizer(token_expression)
         
         #need to read file, get the content, get all the tokens, put into the tokens_list. 
 
-        parsed_file.get_text() 
+        parsed_file.get_text() # make sure beautifulsoup version >= 4.9.0   
 
-        words = ' '.join(soup.stripped_strings) # word is one long string
+        words = ' '.join(parsed_file.stripped_strings) # words is one long string
 
         for token in tokenize(words):
           if token in index_dict and doc_name in index_dict[token]:
             index_dict[token][doc_name] +=1 
           elif token in index_dict:
             index_dict[token][doc_name] = 1 
-        
-        # below is for the deliverables  
-             
-       with open("inverted_index.txt","w") as report:
-        for key, val in index_dict.items():
-          report.write(key + " --> " + val) 
-        
-          
-      
-         
-              
-       
-        
-        
-        
-        
+            
+            
+        with open("inverted_index.txt","w") as report:
+          for key, val in index_dict:
+           report.write(key + " --> " + val) 
