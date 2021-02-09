@@ -14,7 +14,7 @@ import json
 import os # https://www.tutorialspoint.com/python/os_walk.htm
 from collections import defaultdict # when we find doc/term frequency. 
 from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
-
+from bs4 import BeautifulSoup
 
 
 def inverted_index(): 
@@ -24,10 +24,11 @@ def inverted_index():
   tokens_list = [] # list for all the tokens that are found using tokenizer + soup.find_all (hw2) 
   for root, dirs, files in os.walk("./DEV"):
     for doc in files:
-      doc_name = os.path.join(root,name)
+      doc_name = os.path.join(root, doc)
       
       with open(doc_name, "r") as opened:
         content = opened.read() # will get an error using BeautifulSoup 
+
         json_fields = json.loads(content)
         parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
         
