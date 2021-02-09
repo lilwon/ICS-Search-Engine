@@ -47,7 +47,17 @@ def inverted_index():
             index_dict[token][doc_nname] +=1 
           elif token in index_dict:
             index_dict[token][doc_name] = 1 
+            
+            
+       with open("inverted_index.txt","w") as report:
+        for key, val in index_dict:
+          report.write(key + " --> " + val) 
+          
+      
+         
               
+       
         
-        # finding term frequency --> 
+        
+        
         
