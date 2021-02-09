@@ -10,6 +10,7 @@ Create an inverted index for the corpus with data structures designed by you.
 Verify which are the relevant HTML tags to select the important words.
 
 """
+import json 
 import os # https://www.tutorialspoint.com/python/os_walk.htm
 from collections import defaultdict # when we find doc/term frequency. 
 from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
@@ -27,7 +28,8 @@ def inverted_index():
       
       with open(doc_name, "r") as opened:
         content = opened.read() # will get an error using BeautifulSoup 
-        parsed_file = BeautifulSoup(content, "html.parser")
+        json_fields = json.loads(content)
+        parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
         
         token_expression = r'([1-9]\d*(.\d+)?)|\w+' # allow all alphanumeric characters, but if its a number, it will allow a decimal, but only if there is a number after it
         
