@@ -28,7 +28,7 @@ def inverted_index():
       
       with open(doc_name, "r") as opened:
         content = opened.read() # will get an error using BeautifulSoup 
-
+        
         json_fields = json.loads(content)
         parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
         
@@ -40,8 +40,11 @@ def inverted_index():
         
         for text in parsed_file.get_text():
           for token in tokenize(text):
-            tokens_list.append(token)
-        
+            if token in index_dict and doc_name in index_dict[token]:
+              index_dict[token][doc_nname] +=1 
+            elif token in index_dict:
+              index_dict[token][doc_name] = 1 
+              
         
         # finding term frequency --> 
         
