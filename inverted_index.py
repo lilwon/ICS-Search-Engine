@@ -32,7 +32,7 @@ def inverted_index():
         json_fields = json.loads(content)
         parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
         
-        token_expression = r'([1-9]\d*(.\d+)?)|\w+' # allow all alphanumeric characters, but if its a number, it will allow a decimal, but only if there is a number after it
+        token_expression = r'^([1-9]\d*(.\d+)?)|\w+' # allow all alphanumeric characters, but if its a number, it will allow a decimal, but only if there is a number after it
         
         tokenize = RegexpTokenizer(token_expression)
         
