@@ -12,6 +12,7 @@ Verify which are the relevant HTML tags to select the important words.
 """
 import os # https://www.tutorialspoint.com/python/os_walk.htm
 from collections import defaultdict 
+from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
 
 
 
@@ -27,7 +28,7 @@ def inverted_index():
         content = opened.read() # will get an error using BeautifulSoup 
         parsed_file = BeautifulSoup(content, "html.parser")
         
-        # tokenize that bitch 
+        token_expression = '([1-9]\d*(.\d+)?)|\w+' # allow all alphanumeric characters, but if its a number, it will allow a decimal, but only if there is a number after it
         
           
           
