@@ -35,7 +35,9 @@ def inverted_index():
         
         #need to read file, get the content, get all the tokens, put into the tokens_list. 
         
-        for content in parsed_file.find_all(
+        for text in parsed_file.get_text():
+          for token in tokenize(text):
+            tokens_list.append(token)
         
         
         # finding term frequency --> 
