@@ -37,23 +37,17 @@ def inverted_index():
         tokenize = RegexpTokenizer(token_expression)
         
         #need to read file, get the content, get all the tokens, put into the tokens_list. 
-        
-        for text in parsed_file.get_text():
-          for token in tokenize(text):
-            if token in index_dict and doc_name in index_dict[token]:
-              index_dict[token][doc_nname] +=1 
-            elif token in index_dict:
-              index_dict[token][doc_name] = 1 
+
+        parsed_file.get_text() 
+
+        words = ' '.join(soup.stripped_strings) # word is one long string
+
+        for token in tokenize(words):
+          if token in index_dict and doc_name in index_dict[token]:
+            index_dict[token][doc_nname] +=1 
+          elif token in index_dict:
+            index_dict[token][doc_name] = 1 
               
         
         # finding term frequency --> 
         
-        
-        
-          
-          
-          
-        
-  
-  
-
