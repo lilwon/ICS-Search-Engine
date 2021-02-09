@@ -44,14 +44,16 @@ def inverted_index():
 
         for token in tokenize(words):
           if token in index_dict and doc_name in index_dict[token]:
-            index_dict[token][doc_nname] +=1 
+            index_dict[token][doc_name] +=1 
           elif token in index_dict:
             index_dict[token][doc_name] = 1 
-            
-            
+        
+        # below is for the deliverables  
+             
        with open("inverted_index.txt","w") as report:
-        for key, val in index_dict:
+        for key, val in index_dict.items():
           report.write(key + " --> " + val) 
+        
           
       
          
