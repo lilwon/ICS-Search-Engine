@@ -11,12 +11,13 @@ Verify which are the relevant HTML tags to select the important words.
 
 """
 import os # https://www.tutorialspoint.com/python/os_walk.htm
-from collections import defaultdict 
+from collections import defaultdict # when we find doc/term frequency. 
 from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
 
 
 
-def inverted_index():
+def inverted_index(): 
+  # Your index should be stored in one or more files in the file system (no databases!). <<- from instructions 
   
   index_dict = defaultdict(dict)
   tokens_list = [] # list for all the tokens that are found using tokenizer + soup.find_all (hw2) 
@@ -32,7 +33,13 @@ def inverted_index():
         
         tokenize = RegexpTokenizer(token_expression)
         
-        #need to read file one at a time 
+        #need to read file, get the content, get all the tokens, put into the tokens_list. 
+        
+        for content in parsed_file.find_all(
+        
+        
+        # finding term frequency --> 
+        
         
         
           
