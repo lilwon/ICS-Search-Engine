@@ -15,17 +15,34 @@ import os # https://www.tutorialspoint.com/python/os_walk.htm
 from collections import defaultdict # when we find doc/term frequency. 
 from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
 from bs4 import BeautifulSoup
+from simhash import Simhash
+
+# used for holding Simhash differences
+hashed_urls = [] 
 
 # Added lowercase because we want unique words... 
 # The -> the 
 # makes it easier to find all words that are the same for the indexer for now
 def lowercase(text):
   lower_text = ""
-
   for word in text:
     lower_text += word.lower()
 
   return lower_text
+
+def similarity_check(content):
+  # simhash all of the tokens/text  
+  hashed = Simhash(content)
+
+  if len(hashed_urls) == 0:
+    hashed_urls.append(Simhash(content))
+  else:
+    for h in hashed_urls:
+      # If diff < 5 then they the websites are 95-100% the same
+      if ( Simhash(hashed).distance(Simhash(h)) < 5):
+        return False
+
+  return True
 
 
 def inverted_index(): 
@@ -57,29 +74,34 @@ def inverted_index():
         # lower all the words
         words = lowercase(words)
 
-        # CURRENTLY USING URLS FOR ALL DOC IDS
-        # CAN CHANGE THIS LATER
-        for token in tokenize(words):
-          # if the word is not in the index, add the doc_id + init frequency (1)
-          if token not in index_dict:
-            index_dict[token][json_fields['url']] = 1
+        # check simhash of the words before tokenizing them
+        if similarity_check(words) == True:
+          # CURRENTLY USING URLS FOR ALL DOC IDS, CAN CHANGE LATER
+          for token in tokenize(words):
+            # if the word is not in the index, add the doc_id + init frequency (1)
+            if token not in index_dict:
+              index_dict[token][json_fields['url']] = 1
 
-          # Token is already in index, but we need to add NEW doc_id + init frequency(1) 
-          elif token not in index_dict and json_fields['url'] not in index_dict[token]:
-            index_dict[token][json_fields['url']] = 1
+            # Token is already in index, but we need to add NEW doc_id + init frequency(1) 
+            elif token not in index_dict and json_fields['url'] not in index_dict[token]:
+              index_dict[token][json_fields['url']] = 1
 
-          # Increase the frequency if token and doc_id is in the index 
-          elif token in index_dict and json_fields['url'] in index_dict[token]:
-            index_dict[token][json_fields['url']] += 1
+            # Increase the frequency if token and doc_id is in the index 
+            elif token in index_dict and json_fields['url'] in index_dict[token]:
+              index_dict[token][json_fields['url']] += 1
 
-        '''
-        for token in tokenize(words):
-          if token in index_dict and doc_name in index_dict[token]:
-            index_dict[token][doc_name] +=1 
-          elif token in index_dict:
-            index_dict[token][doc_name] = 1 
-        '''    
-        
-        with open("inverted_index.txt","w") as report:
-          for key, val in index_dict:
-           report.write(key + " --> " + val) 
+          '''
+          for token in tokenize(words):
+            if token in index_dict and doc_name in index_dict[token]:
+              index_dict[token][doc_name] +=1 
+            elif token in index_dict:
+              index_dict[token][doc_name] = 1 
+          '''    
+          
+          with open("inverted_index.txt", "w", encoding="utf-8") as report:
+            for key, values in index_dict.items():
+              report.write(key + " --> ") 
+              for subkey, value in values.items():
+                report.write('({}, {}) '.format(subkey, value))
+
+            report.write("\n")
