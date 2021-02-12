@@ -2,7 +2,8 @@
 Create an inverted index for the corpus with data structures designed by you.
 •Tokens:  all alphanumeric sequences in the dataset.
 
-•Stop words:  do not use stopping while indexing, i.e.  use all words, eventhe frequently occurring ones.•Stemming: use stemming for better textual matches.  
+•Stop words:  do not use stopping while indexing, i.e.  use all words, eventhe frequently occurring ones.
+•Stemming: use stemming for better textual matches.  
                Suggestion: Porterstemming, but it is up to you to choose.
 
 
@@ -15,10 +16,8 @@ import os # https://www.tutorialspoint.com/python/os_walk.htm
 from collections import defaultdict # when we find doc/term frequency. 
 from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
 from bs4 import BeautifulSoup
-from simhash import Simhash
 
 # used for holding Simhash differences
-hashed_urls = [] 
 
 # Added lowercase because we want unique words... 
 # The -> the 
@@ -30,25 +29,12 @@ def lowercase(text):
 
   return lower_text
 
-def similarity_check(content):
-  # simhash all of the tokens/text  
-  hashed = Simhash(content)
-
-  if len(hashed_urls) == 0:
-    hashed_urls.append(Simhash(content))
-  else:
-    for h in hashed_urls:
-      # If diff < 5 then they the websites are 95-100% the same
-      if ( Simhash(hashed).distance(Simhash(h)) < 5):
-        return False
-
-  return True
+# make global so we can read outside  
+index_dict = defaultdict(dict)
 
 
 def inverted_index(): 
   # Your index should be stored in one or more files in the file system (no databases!). <<- from instructions 
-  
-  index_dict = defaultdict(dict)
   tokens_list = [] # list for all the tokens that are found using tokenizer + soup.find_all (hw2) 
   for root, dirs, files in os.walk("./DEV"):
     for doc in files:
@@ -56,6 +42,7 @@ def inverted_index():
       
       with open(doc_name, "r") as opened:
         content = opened.read() # will get an error using BeautifulSoup 
+        # IMPORTANT we need to map the doc_id -> url
         
         json_fields = json.loads(content)
         parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
@@ -74,34 +61,31 @@ def inverted_index():
         # lower all the words
         words = lowercase(words)
 
-        # check simhash of the words before tokenizing them
-        if similarity_check(words) == True:
-          # CURRENTLY USING URLS FOR ALL DOC IDS, CAN CHANGE LATER
-          for token in tokenize(words):
-            # if the word is not in the index, add the doc_id + init frequency (1)
-            if token not in index_dict:
-              index_dict[token][json_fields['url']] = 1
+        # CURRENTLY USING URLS FOR ALL DOC IDS, CAN CHANGE LATER
+        for token in tokenize(words):
+          # if the word is not in the index, add the doc_id + init frequency (1)
+          if token not in index_dict:
+            index_dict[token][json_fields['url']] = 1
 
-            # Token is already in index, but we need to add NEW doc_id + init frequency(1) 
-            elif token not in index_dict and json_fields['url'] not in index_dict[token]:
-              index_dict[token][json_fields['url']] = 1
+          # Token is already in index, but we need to add NEW doc_id + init frequency(1) 
+          elif token not in index_dict and json_fields['url'] not in index_dict[token]:
+            index_dict[token][json_fields['url']] = 1
 
-            # Increase the frequency if token and doc_id is in the index 
-            elif token in index_dict and json_fields['url'] in index_dict[token]:
-              index_dict[token][json_fields['url']] += 1
-
-          '''
-          for token in tokenize(words):
-            if token in index_dict and doc_name in index_dict[token]:
-              index_dict[token][doc_name] +=1 
-            elif token in index_dict:
-              index_dict[token][doc_name] = 1 
-          '''    
+          # Increase the frequency if token and doc_id is in the index 
+          elif token in index_dict and json_fields['url'] in index_dict[token]:
+            index_dict[token][json_fields['url']] += 1
           
-          with open("inverted_index.txt", "w", encoding="utf-8") as report:
-            for key, values in index_dict.items():
-              report.write(key + " --> ") 
-              for subkey, value in values.items():
-                report.write('({}, {}) '.format(subkey, value))
 
-            report.write("\n")
+
+if __name__ == "__main__":
+
+  # call inverted_index function
+
+  # write outside otherwise O(n^4) LOL
+  with open("inverted_index.txt", "w", encoding="utf-8") as report:
+    for key, values in index_dict.items():
+      report.write(key + " --> ") 
+      for subkey, value in values.items():
+       report.write('({}, {}) '.format(subkey, value))
+
+  report.write("\n")
