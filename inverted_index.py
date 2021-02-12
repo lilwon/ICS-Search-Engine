@@ -1,3 +1,6 @@
+# Bryan Snyder, Matthew Olitoquit, Lillian Won / Winter 2021 
+
+
 """
 Create an inverted index for the corpus with data structures designed by you.
 •Tokens:  all alphanumeric sequences in the dataset.
