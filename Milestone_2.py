@@ -26,6 +26,24 @@ def query_search(user_input):
 
     sorted_ranks = sorted(ranking.items(), key = lambda i : (-i[1])
 
+    
 
+def retrieve(index_dict):
 
+    queries = user_input.lower().split()
+
+    matching_docs = set()
+    first_query = True
+
+    for query in queries:
+        if query in index_dict:
+            if first_query:
+                for doc, tf in index_dict[i].items():
+                    matching_docs.add(doc)
+                first_query = False
+            else:
+                temp_set = set()
+                for doc, tf in index_dict[i].items():
+                    temp_set.add(doc)
+                matching_docs.intersection(temp_set)
 
