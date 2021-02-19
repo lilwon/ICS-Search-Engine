@@ -84,7 +84,7 @@ def inverted_index():
             index_dict[stem_word][doc_id] = 1
 
           # Token is already in index, but we need to add NEW doc_id + init frequency(1) 
-          elif stem_word not in index_dict and doc_id not in index_dict[stem_word]:
+          elif stem_word in index_dict and doc_id not in index_dict[stem_word]:
             index_dict[stem_word][doc_id] = 1
 
           # Increase the frequency if token and doc_id is in the index 
