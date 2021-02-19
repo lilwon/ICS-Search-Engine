@@ -114,7 +114,7 @@ def retrieve():
       for doc, tf in index_dict[stem_query].items():
         temp_set.add(doc)
 
-      matching_docs.intersection(temp_set)
+      matching_docs = matching_docs.intersection(temp_set)
 
   return matching_docs
 
@@ -138,7 +138,9 @@ with open("docmap.txt", "w", encoding="utf-8") as mapping:
 if __name__ == "__main__":
 
   # call inverted_index function
+  print("Inverted index started")
   inverted_index()
+  print("Inverted index finished")
 
   while True:
     docs_set = retrieve()
