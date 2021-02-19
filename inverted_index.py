@@ -1,6 +1,5 @@
 # Bryan Snyder, Matthew Olitoquit, Lillian Won / Winter 2021 
 
-
 """
 Create an inverted index for the corpus with data structures designed by you.
 •Tokens:  all alphanumeric sequences in the dataset.
@@ -37,12 +36,15 @@ def lowercase(text):
 index_dict = defaultdict(dict)
 doc_id = 0
 
+doc_map = {} # holds mapping of doc_id -> url
+
 porter = PorterStemmer()
 
 def inverted_index(): 
   # Your index should be stored in one or more files in the file system (no databases!). <<- from instructions 
   tokens_list = [] # list for all the tokens that are found using tokenizer + soup.find_all (hw2) 
   for root, dirs, files in os.walk("./DEV"):
+    global doc_id
     for doc in files:
       doc_name = os.path.join(root, doc)
       
@@ -51,9 +53,11 @@ def inverted_index():
         doc_id += 1
 
         content = opened.read() # will get an error using BeautifulSoup 
-        # IMPORTANT we need to map the doc_id -> url
         
         json_fields = json.loads(content)
+        # map the doc_id -> url
+        doc_map[doc_id] = json_fields['url']
+
         parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
         
         #token_expression = r'^([1-9]\d*(.\d+)?)|\w+' # allow all alphanumeric characters, but if its a number, it will allow a decimal, but only if there is a number after it
@@ -86,8 +90,29 @@ def inverted_index():
           # Increase the frequency if token and doc_id is in the index 
           elif stem_word in index_dict and doc_id in index_dict[stem_word]:
             index_dict[stem_word][doc_id] += 1
-          
 
+
+def retrieve():
+  queries = input("Enter a query: ").lower().split(" ")
+
+  matching_docs = set()
+  first_query = True
+
+  for query in queries:
+    stem_query = porter.stem(query)
+
+    if first_query:
+      for doc, tf in index_dict[stem_query].items():
+        matching_docs.add(doc)
+      first_query = False
+    else:
+      temp_set = set()
+      for doc, tf in index_dict[stem_query].items():
+        temp_set.add(doc)
+
+      matching_docs.intersection(temp_set)
+
+  return matching_docs
 
 if __name__ == "__main__":
 
@@ -95,6 +120,7 @@ if __name__ == "__main__":
   inverted_index()
 
   # write outside otherwise O(n^4) LOL
+  '''
   with open("inverted_index.txt", "w", encoding="utf-8") as report:
     for key, values in index_dict.items():
       report.write(key + " --> ") 
@@ -104,3 +130,19 @@ if __name__ == "__main__":
       report.write("\n")
 
   print("Number of docs indexed: ", doc_id)
+
+
+  '''
+
+  '''
+  with open("docmap.txt", "w", encoding="utf-8") as mapping:
+      for key, value in doc_map.items():
+          mapping.write(str(key) + ", " + value + "\n")
+  '''
+
+  while True:
+    docs_set = retrieve()
+    docs_list = list(docs_set)[:5] # get top 5 links
+
+    for item in docs_list:
+      print(doc_map[item])
