@@ -104,7 +104,7 @@ def retrieve():
 
   for query in queries:
     stem_query = porter.stem(query)
-
+    # (Possibly include if statement to check if any of the sets are empty)
     if first_query:
       for doc, tf in index_dict[stem_query].items():
         matching_docs.add(doc)
