@@ -75,9 +75,9 @@ def inverted_index():
         words = lowercase(words)
 
         # CURRENTLY USING URLS FOR ALL DOC IDS, CAN CHANGE LATER
-        for token in tokenize(words):
+        for token in tokenize.tokenize(words):
 
-          stem_word = porter(token)
+          stem_word = porter.stem(token)
 
           # if the word is not in the index, add the doc_id + init frequency (1)
           if stem_word not in index_dict:
