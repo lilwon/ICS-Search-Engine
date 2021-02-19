@@ -93,6 +93,10 @@ def inverted_index():
 
 
 def retrieve():
+  '''
+      Currently uses boolean retrieval for queries with AND
+  '''
+
   queries = input("Enter a query: ").lower().split(" ")
 
   matching_docs = set()
