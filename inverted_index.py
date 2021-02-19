@@ -41,8 +41,8 @@ def lowercase(text):
 def inverted_index(): 
   # Your index should be stored in one or more files in the file system (no databases!). <<- from instructions 
   tokens_list = [] # list for all the tokens that are found using tokenizer + soup.find_all (hw2) 
+  global doc_id
   for root, dirs, files in os.walk("./DEV"):
-    global doc_id
     for doc in files:
       doc_id += 1
       doc_name = os.path.join(root, doc)
