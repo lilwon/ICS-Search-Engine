@@ -40,7 +40,7 @@ def lowercase(text):
 
 def inverted_index(): 
   # Your index should be stored in one or more files in the file system (no databases!). <<- from instructions 
-  tokens_list = [] # list for all the tokens that are found using tokenizer + soup.find_all (hw2) 
+  #tokens_list = [] # list for all the tokens that are found using tokenizer + soup.find_all (hw2) 
   global doc_id
   for root, dirs, files in os.walk("./DEV"):
     for doc in files:
@@ -118,33 +118,27 @@ def retrieve():
 
   return matching_docs
 
+# write outside otherwise O(n^4) LOL
+'''
+with open("inverted_index.txt", "w", encoding="utf-8") as report:
+  for key, values in index_dict.items():
+    report.write(key + " --> ") 
+    for subkey, value in values.items():
+      report.write('({}, {}) '.format(subkey, value))
 
+    report.write("\n")
+
+print("Number of docs indexed: ", doc_id)
+
+with open("docmap.txt", "w", encoding="utf-8") as mapping:
+    for key, value in doc_map.items():
+        mapping.write(str(key) + ", " + value + "\n")
+'''
 
 if __name__ == "__main__":
 
   # call inverted_index function
   inverted_index()
-
-  # write outside otherwise O(n^4) LOL
-  '''
-  with open("inverted_index.txt", "w", encoding="utf-8") as report:
-    for key, values in index_dict.items():
-      report.write(key + " --> ") 
-      for subkey, value in values.items():
-       report.write('({}, {}) '.format(subkey, value))
-
-      report.write("\n")
-
-  print("Number of docs indexed: ", doc_id)
-
-
-  '''
-
-  '''
-  with open("docmap.txt", "w", encoding="utf-8") as mapping:
-      for key, value in doc_map.items():
-          mapping.write(str(key) + ", " + value + "\n")
-  '''
 
   while True:
     docs_set = retrieve()
