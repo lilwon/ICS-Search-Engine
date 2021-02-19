@@ -20,8 +20,13 @@ from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alp
 from  nltk.stem import PorterStemmer
 from bs4 import BeautifulSoup
 
-# used for holding Simhash differences
+# make global so we can read outside  
+index_dict = defaultdict(dict)
+doc_id = 0
 
+doc_map = {} # holds mapping of doc_id -> url
+
+porter = PorterStemmer()
 # Added lowercase because we want unique words... 
 # The -> the 
 # makes it easier to find all words that are the same for the indexer for now
@@ -32,13 +37,6 @@ def lowercase(text):
 
   return lower_text
 
-# make global so we can read outside  
-index_dict = defaultdict(dict)
-doc_id = 0
-
-doc_map = {} # holds mapping of doc_id -> url
-
-porter = PorterStemmer()
 
 def inverted_index(): 
   # Your index should be stored in one or more files in the file system (no databases!). <<- from instructions 
@@ -46,11 +44,10 @@ def inverted_index():
   for root, dirs, files in os.walk("./DEV"):
     global doc_id
     for doc in files:
+      doc_id += 1
       doc_name = os.path.join(root, doc)
-      
+       
       with open(doc_name, "r") as opened:
-        # start at 1 instead of 0
-        doc_id += 1
 
         content = opened.read() # will get an error using BeautifulSoup 
         
@@ -62,20 +59,23 @@ def inverted_index():
         
         #token_expression = r'^([1-9]\d*(.\d+)?)|\w+' # allow all alphanumeric characters, but if its a number, it will allow a decimal, but only if there is a number after it
 
-        token_expression = r'\w+|\$[\d\.]+\S+|\d*\.d+\)' # Lillian's regex from https://www.kite.com/python/docs/nltk.RegexpTokenizer
-        tokenize = RegexpTokenizer(token_expression)
-        
+        #token_expression = r'\w+|\$[\d\.]+\S+|\d*\.d+\)' # Lillian's regex from https://www.kite.com/python/docs/nltk.RegexpTokenizer
+        #tokenize = RegexpTokenizer(token_expression)
+
         #need to read file, get the content, get all the tokens, put into the tokens_list. 
 
-        parsed_file.get_text() # make sure beautifulsoup version >= 4.9.0   
+        parsed_file.get_text() # make sure beautifulsoup version >= 4.9.0  
+
 
         words = ' '.join(parsed_file.stripped_strings) # words is one long string
 
         # lower all the words
         words = lowercase(words)
 
+        tokenizer = RegexpTokenizer(r'\w+|\$[\d\.]+\S+|\d*\.d+\)')
+
         # CURRENTLY USING URLS FOR ALL DOC IDS, CAN CHANGE LATER
-        for token in tokenize.tokenize(words):
+        for token in tokenizer.tokenize(words):
 
           stem_word = porter.stem(token)
 
@@ -117,6 +117,8 @@ def retrieve():
       matching_docs.intersection(temp_set)
 
   return matching_docs
+
+
 
 if __name__ == "__main__":
 
