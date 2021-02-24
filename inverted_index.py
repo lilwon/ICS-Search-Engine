@@ -17,7 +17,7 @@ import json
 import os # https://www.tutorialspoint.com/python/os_walk.htm
 from collections import defaultdict # when we find doc/term frequency. 
 from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
-from  nltk.stem import PorterStemmer
+from nltk.stem.snowball import SnowballStemmer 
 from bs4 import BeautifulSoup
 
 # make global so we can read outside  
@@ -26,7 +26,8 @@ doc_id = 0
 
 doc_map = {} # holds mapping of doc_id -> url
 
-porter = PorterStemmer()
+porter = SnowballStemmer(language='english') 
+# https://www.geeksforgeeks.org/snowball-stemmer-nlp/ 
 # Added lowercase because we want unique words... 
 # The -> the 
 # makes it easier to find all words that are the same for the indexer for now
