@@ -1,2 +1,4 @@
 # ignore corpus
 /DEV
+inverted_index2.txt
+doc_id_map.txt
