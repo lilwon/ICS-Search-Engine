@@ -15,6 +15,8 @@ Verify which are the relevant HTML tags to select the important words.
 """
 import json 
 import os # https://www.tutorialspoint.com/python/os_walk.htm
+import re
+
 from collections import defaultdict # when we find doc/term frequency. 
 #from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
 from nltk.tokenize import WordPunctTokenizer
@@ -39,9 +41,9 @@ porter = SnowballStemmer(language='english')
 # The -> the 
 # makes it easier to find all words that are the same for the indexer for now
 def lowercase(text):
-  lower_text = ""
+  lower_text = [] 
   for word in text:
-    lower_text += word.lower()
+    lower_text.append(word.lower())
 
   return lower_text
 
@@ -76,9 +78,11 @@ def inverted_index():
         parsed_file.get_text() # make sure beautifulsoup version >= 4.9.0  
         tokens = ' '.join(parsed_file.stripped_strings) # words is one long string
         # lower all the words
-        tokens = lowercase(tokens)
 
-        tokens = WordPunctTokenizer().tokenize(tokens)
+        tokens = re.split(r"[^0-9a-zA-Z]+", tokens) # puts string to list and tokenize. only accept numbers and letters 
+
+        tokens = lowercase(tokens)
+        # tokens = WordPunctTokenizer().tokenize(tokens) # doesn't remove foreign characters  
 
         #tokenizer = RegexpTokenizer(r'\w+|\$[\d\.]+\S+')
 
