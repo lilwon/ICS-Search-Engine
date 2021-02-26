@@ -2,3 +2,7 @@
 /DEV
 inverted_index2.txt
 doc_id_map.txt
+/__pycache__
+partial_index1.txt
+partial_index2.txt
+partial_index3.txt

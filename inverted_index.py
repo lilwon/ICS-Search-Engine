@@ -16,7 +16,9 @@ Verify which are the relevant HTML tags to select the important words.
 import json 
 import os # https://www.tutorialspoint.com/python/os_walk.htm
 from collections import defaultdict # when we find doc/term frequency. 
-from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
+#from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
+from nltk.tokenize import WordPunctTokenizer
+# from nltk.corpus import words not working for some reason.. program gets stuck
 from nltk.stem.snowball import SnowballStemmer 
 from bs4 import BeautifulSoup
 
@@ -28,7 +30,7 @@ from search_component import retrieve
 # global keyword for all of them
 index_dict = defaultdict(dict)
 doc_id = 0
-
+batch_number = 1 # set as global variable 
 doc_map = {} # holds mapping of doc_id -> url
 
 porter = SnowballStemmer(language='english') 
@@ -48,21 +50,22 @@ def inverted_index():
   # Your index should be stored in one or more files in the file system (no databases!). <<- from instructions 
   #tokens_list = [] # list for all the tokens that are found using tokenizer + soup.find_all (hw2) 
   global doc_id
+  global batch_number 
+  batch_threshold = 18667 # 56000 files /3 = 18666.66 --> 18667 as our threshold to divide it into three parts
+
   for root, dirs, files in os.walk("./DEV"):
     for doc in files:
       doc_id += 1
       doc_name = os.path.join(root, doc)
-       
-      with open(doc_name, "r") as opened:
 
-        content = opened.read() # will get an error using BeautifulSoup 
-        
+      # still doesn't remove foreign characters 
+      with open(doc_name, "r", encoding='utf-8', errors='replace') as opened:
+        content = opened.read() 
         json_fields = json.loads(content)
         # map the doc_id -> url
         doc_map[doc_id] = json_fields['url']
-
         parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
-        
+
         #token_expression = r'^([1-9]\d*(.\d+)?)|\w+' # allow all alphanumeric characters, but if its a number, it will allow a decimal, but only if there is a number after it
 
         #token_expression = r'\w+|\$[\d\.]+\S+|\d*\.d+\)' # Lillian's regex from https://www.kite.com/python/docs/nltk.RegexpTokenizer
@@ -71,28 +74,42 @@ def inverted_index():
         #need to read file, get the content, get all the tokens, put into the tokens_list. 
 
         parsed_file.get_text() # make sure beautifulsoup version >= 4.9.0  
-        words = ' '.join(parsed_file.stripped_strings) # words is one long string
+        tokens = ' '.join(parsed_file.stripped_strings) # words is one long string
         # lower all the words
-        words = lowercase(words)
-        tokenizer = RegexpTokenizer(r'\w+|\$[\d\.]+\S+|\d*\.d+\)')
+        tokens = lowercase(tokens)
 
-        # Tokenize the words and start and put them in the inverted index_dict 
-        for token in tokenizer.tokenize(words):
-          stem_word = porter.stem(token)
-          # if the word is not in the index, add the doc_id + init frequency (1)
-          if stem_word not in index_dict:
-            index_dict[stem_word][doc_id] = 1
-          # Token is already in index, but we need to add NEW doc_id + init frequency(1) 
-          elif stem_word in index_dict and doc_id not in index_dict[stem_word]:
-            index_dict[stem_word][doc_id] = 1
-          # Increase the frequency if token and doc_id is in the index 
-          elif stem_word in index_dict and doc_id in index_dict[stem_word]:
-            index_dict[stem_word][doc_id] += 1
+        tokens = WordPunctTokenizer().tokenize(tokens)
 
-      # start splitting the number of docs here
-      # sort and write the disk
+        #tokenizer = RegexpTokenizer(r'\w+|\$[\d\.]+\S+')
 
-      # empty index_dict
+        # Tokenize the words and put them in the inverted index_dict 
+        #for token in tokenizer.tokenize(words):
+        for token in tokens:
+          # only add alphanumeric words to index also check if the token is in nltk corpus words
+          if token.isalnum(): 
+            stem_word = porter.stem(token)
+            # if the word is not in the index, add the doc_id + init frequency (1)
+            if stem_word not in index_dict:
+              index_dict[stem_word][doc_id] = 1
+            # Token is already in index, but we need to add NEW doc_id + init frequency(1) 
+            elif stem_word in index_dict and doc_id not in index_dict[stem_word]:
+              index_dict[stem_word][doc_id] = 1
+            # Increase the frequency if token and doc_id is in the index 
+            elif stem_word in index_dict and doc_id in index_dict[stem_word]:
+              index_dict[stem_word][doc_id] += 1
+
+        if ( doc_id % batch_threshold == 0): 
+          sort_and_write_to_disk()
+          index_dict.clear()
+          batch_number += 1
+
+  # check if there's anything inside the index dict to write last batch to disk
+  if ( any(index_dict) ):
+    sort_and_write_to_disk()
+    index_dict.clear()
+    batch_number += 1
+
+
 
 # write outside otherwise O(n^4) LOL 
 '''
@@ -112,6 +129,14 @@ with open("docmap.txt", "w", encoding="utf-8") as mapping:
     for key, value in doc_map.items():
         mapping.write(str(key) + ", " + value + "\n")
 '''
+
+
+def sort_and_write_to_disk():
+  with open("partial_index"+str(batch_number)+".txt", "w", encoding="utf-8") as report:
+    sort_inverted_index = sorted(index_dict.items(), key = lambda x: x[0])
+    for item in sort_inverted_index:
+      report.write(str(item) + "\n")
+
 if __name__ == "__main__":
 
   # call inverted_index function
@@ -119,17 +144,21 @@ if __name__ == "__main__":
   inverted_index()
   #print("Inverted index finished")
 
+  '''
   with open("inverted_index2.txt", "w", encoding="utf-8") as report:
     sort_inverted_index = sorted(index_dict.items(), key=lambda x: x[0])
     for item in sort_inverted_index:
       report.write(str(item) + "\n")
+  '''
 
+  # need to figure out merging files
 
+  # dont have to write the mapping since it doesn't use that much in-memory
   with open("doc_id_map.txt", "w") as mapping:
     for key, value in doc_map.items():
       mapping.write(str(key) + ", " + value + "\n" )
 
-  # dont need to test the indexer
+  # dont need below to test the indexer
   '''
   while True:
     docs_set = retrieve(index_dict)
