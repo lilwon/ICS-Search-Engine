@@ -19,13 +19,14 @@ import re
 
 from collections import defaultdict # when we find doc/term frequency. 
 #from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
-from nltk.tokenize import WordPunctTokenizer
+#from nltk.tokenize import WordPunctTokenizer 
 # from nltk.corpus import words not working for some reason.. program gets stuck
 from nltk.stem.snowball import SnowballStemmer 
 from bs4 import BeautifulSoup
 
 # this is for the search retrieval
 from search_component import retrieve
+from index_of_index import index_of_inverted_index
 
 # make global so we can read outside  
 # might have to move all these values inside functions and use
@@ -161,6 +162,17 @@ if __name__ == "__main__":
   with open("doc_id_map.txt", "w") as mapping:
     for key, value in doc_map.items():
       mapping.write(str(key) + ", " + value + "\n" )
+
+  # after finished merging, create an index of the inverted index
+  # change filename to w.e merged inverted_index file is called
+  position_index = index_of_inverted_index("inverted_index2.txt")
+
+  # Save to an output file if needed, but we can keep above in memory! (~1mil tokens)
+  ''' 
+  with open("testing_word_offsets.txt", "w") as f2:
+    for key, value in position_index.items():
+      f2.write(key + ", " + str(value) + "\n")
+  '''
 
   # dont need below to test the indexer
   '''
