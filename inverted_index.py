@@ -16,6 +16,9 @@ Verify which are the relevant HTML tags to select the important words.
 import json 
 import os # https://www.tutorialspoint.com/python/os_walk.htm
 import re
+import ast
+import math
+
 
 from collections import defaultdict # when we find doc/term frequency. 
 #from nltk.tokenize import RegexpTokenizer # use this to find tokens that are alphanumeric, but also numbers with decimals (but not next to letters) 
@@ -124,6 +127,37 @@ def sort_and_write_to_disk():
     for item in sort_inverted_index:
       report.write(str(item) + "\n")
 
+
+
+
+# position_index is a dict { token: position}
+def get_tfidf_index(file_name):
+  # this would contain { doc_id: tf-idfscore }
+  tfidf_index = defaultdict(float) 
+  # need to iterate over merged inverted_index.txt
+  with open(file_name, "r") as inverted_index_file:
+    # for every token in the document.. 
+    for line in inverted_index_file:
+      posting = ast.literal_eval(line) # ( token, {doc1: tf, doc2: tf, doc3: tf, ... } )
+      # for every doc_id we need to extract the term frequency of the token..compute the tf-idf.  
+      # posting[1] = { doc1: tf, doc2: tf, doc3:tf, ...}
+      temp_dict = posting[1];
+      for doc_num in temp_dict: 
+        # ( 1 + log(term-freq) ) * log(  # docs  / # times appear in docs ) 
+        tfidf_score = (1 + math.log(temp_dict[doc_num])) * math.log(doc_id / len(temp_dict))
+      
+        if doc_num in tfidf_index:
+          tfidf_index[doc_num] += tfidf_score
+        else: 
+          tfidf_index[doc_num] = tfidf_score
+
+  # write tfidf_index to another file?
+  with open("tfidf_index.txt", "w") as tfidf_file:
+    for item in tfidf_index:
+      tfidf_file.write(str(item) + "\n")
+
+  return tfidf_index
+
 if __name__ == "__main__":
 
   # call inverted_index function
@@ -146,6 +180,12 @@ if __name__ == "__main__":
   # after finished merging, create an index of the inverted index
   # change filename to w.e merged inverted_index file is called
   position_index = index_of_inverted_index("inverted_index2.txt")
+
+  tfidf_index = get_tfidf_index("inverted_index2.txt")
+
+  # get all position of inverted_index. but we want to do tf-idf of entire inverted_index
+
+
 
   # Save to an output file if needed, but we can keep above in memory! (~1mil tokens)
   ''' 
