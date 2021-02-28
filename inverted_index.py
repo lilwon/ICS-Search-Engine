@@ -28,7 +28,7 @@ from nltk.stem.snowball import SnowballStemmer
 from bs4 import BeautifulSoup
 
 # this is for the search retrieval
-from search_component import retrieve
+#from search_component import retrieve
 from index_of_index import index_of_inverted_index
 
 # make global so we can read outside  
@@ -38,6 +38,8 @@ index_dict = defaultdict(dict)
 doc_id = 0
 #batch_number = 1 # set as global variable 
 doc_map = {} # holds mapping of doc_id -> url
+position_index = {} 
+tfidf_index = {}
 
 porter = SnowballStemmer(language='english') 
 # https://www.geeksforgeeks.org/snowball-stemmer-nlp/
@@ -156,7 +158,7 @@ def get_tfidf_index(file_name):
   # write tfidf_index to another file?
   with open("tfidf_index.txt", "w") as tfidf_file:
     for key in sorted(tfidf_index):
-      tfidf_file.write("{" + str(key) + ": " + str(round(tfidf_index[key], 3)) + "} \n" )
+      tfidf_file.write("(" + str(key) + ", " + str(round(tfidf_index[key], 3)) + ") \n" )
 
   return tfidf_index
 
@@ -164,23 +166,20 @@ if __name__ == "__main__":
 
   # call inverted_index function
   #print("Inverted index started")
-  #inverted_index()
+  inverted_index()
   #print("Inverted index finished")
 
-  '''
   with open("inverted_index2.txt", "w", encoding="utf-8") as report:
     sort_inverted_index = sorted(index_dict.items(), key=lambda x: x[0])
     for item in sort_inverted_index:
       report.write(str(item) + "\n")
-  '''
   # need to figure out merging files
 
-  '''
+  # save all docs as a tuple... to make it much easier to save as dict later on
   # dont have to write the mapping since it doesn't use that much in-memory
   with open("doc_id_map.txt", "w") as mapping:
-    for key, value in doc_map.items():
-      mapping.write(str(key) + ", " + value + "\n" )
-  '''
+    for key in doc_map:
+      mapping.write("(" + str(key) + ", " + doc_map[key] + ") \n" )
   
   # after finished merging, create an index of the inverted index
   # change filename to w.e merged inverted_index file is called
@@ -190,14 +189,10 @@ if __name__ == "__main__":
 
   # get all position of inverted_index. but we want to do tf-idf of entire inverted_index
 
-
-
   # Save to an output file if needed, but we can keep above in memory! (~1mil tokens)
-  ''' 
-  with open("testing_word_offsets.txt", "w") as f2:
-    for key, value in position_index.items():
-      f2.write(key + ", " + str(value) + "\n")
-  '''
+  with open("word_offsets.txt", "w") as f2:
+    for key in position_index:
+      f2.write("('" + key + "', " + str(position_index[key]) + ") \n")  
 
   # dont need below to test the indexer
   '''
