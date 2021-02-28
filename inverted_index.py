@@ -144,17 +144,19 @@ def get_tfidf_index(file_name):
       temp_dict = posting[1];
       for doc_num in temp_dict: 
         # ( 1 + log(term-freq) ) * log(  # docs  / # times appear in docs ) 
-        tfidf_score = (1 + math.log(temp_dict[doc_num])) * math.log(doc_id / len(temp_dict))
-      
+        #tfidf_score = (1 + math.log10(temp_dict[doc_num])) * math.log10(doc_id / len(temp_dict))
+        tfidf_score = (1 + math.log10(temp_dict[doc_num])) * math.log10( 55393 / len(temp_dict))
+
         if doc_num in tfidf_index:
           tfidf_index[doc_num] += tfidf_score
         else: 
           tfidf_index[doc_num] = tfidf_score
 
+
   # write tfidf_index to another file?
   with open("tfidf_index.txt", "w") as tfidf_file:
-    for item in tfidf_index:
-      tfidf_file.write(str(item) + "\n")
+    for key in sorted(tfidf_index):
+      tfidf_file.write("{" + str(key) + ": " + str(round(tfidf_index[key], 3)) + "} \n" )
 
   return tfidf_index
 
@@ -162,21 +164,24 @@ if __name__ == "__main__":
 
   # call inverted_index function
   #print("Inverted index started")
-  inverted_index()
+  #inverted_index()
   #print("Inverted index finished")
 
+  '''
   with open("inverted_index2.txt", "w", encoding="utf-8") as report:
     sort_inverted_index = sorted(index_dict.items(), key=lambda x: x[0])
     for item in sort_inverted_index:
       report.write(str(item) + "\n")
-
+  '''
   # need to figure out merging files
 
+  '''
   # dont have to write the mapping since it doesn't use that much in-memory
   with open("doc_id_map.txt", "w") as mapping:
     for key, value in doc_map.items():
       mapping.write(str(key) + ", " + value + "\n" )
-
+  '''
+  
   # after finished merging, create an index of the inverted index
   # change filename to w.e merged inverted_index file is called
   position_index = index_of_inverted_index("inverted_index2.txt")
