@@ -6,6 +6,7 @@
 
 '''
 import ast
+import datetime
 
 from collections import defaultdict
 from nltk.stem.snowball import SnowballStemmer
@@ -56,15 +57,17 @@ def store_in_memory(file_name):
 
 # Lecture 19 - Slide 34
 # f1 = inverted_index.txt, f2 = word_offsets.txt, f3 = doc_id_map, f4 = tfidf_index 
-def retrieval(queries, offset_index, docid_index, tfidf_index):
+def retrieval(queries, offset_index, tfidf_index):
   temp_list = [] 
   results = PriorityQueue() # this will be returned to the user 
   # Whoever has highest "priority" = displayed first.. 
+  start_time = 0
 
   # matching_docs = set() 
   for query in queries:
     with open("inverted_index2.txt", "r") as f:
       # start timer? 
+      start_time = datetime.datetime.now() 
       # check if query is in the inverted_index
       if query in offset_index:
         # get the position
@@ -72,21 +75,28 @@ def retrieval(queries, offset_index, docid_index, tfidf_index):
         f.seek(pos) # move the file pointer to location on file
         posting = ast.literal_eval(f.readline()) # save token and postings
         # posting[1] = { doc1: tf, doc2: tf, doc3: tf.... }
-        docIds_list = posting[1].keys()
+        docId_list = posting[1].keys()
         # add it to the temp_list
-        temp_list.extend(docIds_list) # better as a set??
-
+        temp_list.extend(docId_list) # better as a set??
       else:
         print("No word found")
-    
+
+  # stop timer
+  stop_time = datetime.datetime.now() 
+
+  elapsed_time = stop_time - start_time
+
+  print( str(elapsed_time.total_seconds() * 1000) + " milliseconds" )
+
   # for all documents in temp_list...
 
+  return temp_list
 
 
 if __name__ == "__main__":
   # need a faster way to do this..
   word_offsets = store_in_memory("word_offsets.txt") 
-  docid_index = store_in_memory("doc_id_map.txt")
+  #docid_index = store_in_memory("doc_id_map.txt")
   tfidf_index = store_in_memory("tfidf_index.txt")
 
   # check if it worked
@@ -105,4 +115,6 @@ if __name__ == "__main__":
   for query in queries:
     stemmed_query.append(porter.stem(query))
 
-  res = retrieval(stemmed_query, word_offsets, docid_index, tfidf_index)
+  res = retrieval(stemmed_query, word_offsets, tfidf_index)
+
+  print(res)

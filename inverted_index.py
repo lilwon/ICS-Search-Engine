@@ -179,7 +179,7 @@ if __name__ == "__main__":
   # dont have to write the mapping since it doesn't use that much in-memory
   with open("doc_id_map.txt", "w") as mapping:
     for key in doc_map:
-      mapping.write("(" + str(key) + ", " + doc_map[key] + ") \n" )
+      mapping.write("(" + str(key) + ", '" + doc_map[key] + "') \n" )
   
   # after finished merging, create an index of the inverted index
   # change filename to w.e merged inverted_index file is called
