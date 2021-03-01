@@ -15,35 +15,6 @@ from queue import PriorityQueue
 
 # from inverted_index import doc_map, position_index, tfidf_index
 
-'''
-# This retrieval function uses Boolean Retrieval AND
-def retrieve(index_dict):
-
-  # create another porter stemmer object
-  porter = SnowballStemmer(language="english")
-
-  queries = input("Enter a query: ").lower().split(" ")
-
-  matching_docs = set()
-  first_query = True
-
-  for query in queries:
-    stem_query = porter.stem(query)
-    # (Possibly include if statement to check if any of the sets are empty)
-    if first_query:
-      for doc, tf in index_dict[stem_query].items():
-        matching_docs.add(doc)
-      first_query = False
-    else:
-      temp_set = set()
-      for doc, tf in index_dict[stem_query].items():
-        temp_set.add(doc)
-
-      matching_docs = matching_docs.intersection(temp_set)
-
-  # send results 
-  return matching_docs
-'''
 # returns a dictionary from files created by indexer
 def store_in_memory(file_name):
   vals = {}
@@ -57,8 +28,7 @@ def store_in_memory(file_name):
 
 
 # Lecture 19 - Slide 34
-# f1 = inverted_index.txt, f2 = word_offsets.txt, f3 = doc_id_map, f4 = tfidf_index 
-def retrieval(queries, offset_index, tfidf_index):
+def retrieval(queries, offset_index, tfidf_index, docid_index):
   #temp_list = [] 
   temp_dict = {}
   # Whoever has highest "priority" = displayed first.. 
@@ -91,11 +61,11 @@ def retrieval(queries, offset_index, tfidf_index):
       # get current document from token
       doc_id_int = int(doc_id)
       if doc_id_int in temp_dict[token]:
-        # doc_id matches the doc_id 
-        # print( doc_id ) 
-        # now get temp_dict[token] -> doc_id
-        # now get the tf-idf of doc_id
-        temp_score = tfidf_index[doc_id_int] 
+        temp_score = tfidf_index[doc_id_int]  
+        # check to see if the document is a .txt page ?
+        # might actually need to do a re.match/re.search for these values.. 
+        if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id]:
+          temp_score *= 0.0001 
 
         doc_score[doc_id_int] += temp_score
     
@@ -111,9 +81,8 @@ def retrieval(queries, offset_index, tfidf_index):
 
   print( str(elapsed_time.total_seconds() * 1000) + " milliseconds" )
 
-  # for all documents in temp_list...
-
-  return ret_val 
+  # return top 20 results.
+  return ret_val[:20] 
 
 
 if __name__ == "__main__":
@@ -148,7 +117,7 @@ if __name__ == "__main__":
   for query in queries:
     stemmed_query.append(porter.stem(query))
 
-  res = retrieval(stemmed_query, word_offsets, tfidf_index)
+  res = retrieval(stemmed_query, word_offsets, tfidf_index, docid_index)
 
   print(res)
   print(type(res))

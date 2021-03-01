@@ -147,6 +147,8 @@ def get_tfidf_index(file_name):
         #tfidf_score = (1 + math.log10(temp_dict[doc_num])) * math.log10(doc_id / len(temp_dict))
         tfidf_score = (1 + math.log10(temp_dict[doc_num])) * math.log10( 55393 / len(temp_dict))
 
+        # might be better to change the term frequency of document to tf-idf score..
+        # instead of accumulating tf-idf scores of all docs.. problem for retrieval.. 
         if doc_num in tfidf_index:
           tfidf_index[doc_num] += tfidf_score
         else: 
