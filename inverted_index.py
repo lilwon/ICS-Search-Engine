@@ -279,12 +279,12 @@ if __name__ == "__main__":
   inverted_index()
   #print("Inverted index finished")
   # merge_all()
-  ''' 
+
   with open("inverted_index2.txt", "w", encoding="utf-8") as report:
     sort_inverted_index = sorted(index_dict.items(), key=lambda x: x[0])
     for item in sort_inverted_index:
       report.write(str(item) + "\n")
-  '''
+
   # need to figure out merging files
 
   # save all docs as a tuple... to make it much easier to save as dict later on
