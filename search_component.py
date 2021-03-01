@@ -29,7 +29,6 @@ def store_in_memory(file_name):
 
 # Lecture 19 - Slide 34
 def retrieval(queries, offset_index, docid_index):
-  #temp_list = [] 
   temp_dict = {}
   # Whoever has highest "priority" = displayed first.. 
   start_time = datetime.datetime.now()  # set to a value if entered stopwords in query 
@@ -46,10 +45,6 @@ def retrieval(queries, offset_index, docid_index):
         f.seek(pos) # move the file pointer to location on file
         posting = ast.literal_eval(f.readline()) # save token and postings
         # posting[1] = { doc1: tf, doc2: tf, doc3: tf.... }
-        # docId_list = posting[1].keys()
-        # entry = f.readline() 
-        # entry =  token: {doc1: tf, doc2: tf...} = TUPLE.. with a dict 
-        # temp_list.extend(ast.literal_eval(entry)) 
         temp_dict[posting[0]] = posting[1]
       else:
         print("No word found in inverted_list")
@@ -70,16 +65,13 @@ def retrieval(queries, offset_index, docid_index):
           temp_score *= 0.5 
 
         doc_score[doc_id_int] += temp_score
-    
-    # to add to PriorityQueue we would have to multiply by -1 
-    # so the "highest score" would be the first result in PQ
 
+  # sort values to get best score first
   ret_val=sorted(doc_score.items(), key=lambda x: x[1], reverse = True)
 
   # print(ret_val[0])
   # print(type(ret_val[0]))
   
-
   url_list = []
   # retreive the actual url here? 
   for temp_tuple in ret_val:

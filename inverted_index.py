@@ -26,6 +26,7 @@ from collections import defaultdict, Mapping # when we find doc/term frequency. 
 # from nltk.corpus import words not working for some reason.. program gets stuck
 from nltk.stem.snowball import SnowballStemmer 
 from bs4 import BeautifulSoup
+from urllib.parse import urldefrag
 
 # this is for the search retrieval
 #from search_component import retrieve
@@ -44,6 +45,7 @@ doc_id = 0
 doc_map = {} # holds mapping of doc_id -> url
 position_index = {} 
 tfidf_index = {}
+doc_seen = set()
 
 porter = SnowballStemmer(language='english') 
 # https://www.geeksforgeeks.org/snowball-stemmer-nlp/
@@ -60,64 +62,62 @@ def lowercase(text):
 # create inverted_index files
 def inverted_index(): 
   # Your index should be stored in one or more files in the file system (no databases!). <<- from instructions 
-  #tokens_list = [] # list for all the tokens that are found using tokenizer + soup.find_all (hw2) 
   global doc_id
   #global batch_number 
   batch_threshold = 18667 # 56000 files /3 = 18666.66 --> 18667 as our threshold to divide it into three parts
 
   for root, dirs, files in os.walk("./DEV"):
     for doc in files:
-      doc_id += 1
       doc_name = os.path.join(root, doc)
-
       # still doesn't remove foreign characters 
       with open(doc_name, "r", encoding='utf-8', errors='replace') as opened:
+        doc_id += 1
         content = opened.read() 
         json_fields = json.loads(content)
         # map the doc_id -> url
-        doc_map[doc_id] = json_fields['url']
-        parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
 
-        #token_expression = r'^([1-9]\d*(.\d+)?)|\w+' # allow all alphanumeric characters, but if its a number, it will allow a decimal, but only if there is a number after it
+        # defrag the url before we save to doc_id
+        defragged = urldefrag(json_fields['url'])
+        # save to seen
+        if defragged not in doc_seen:
+          doc_seen.add(defragged)
+          doc_map[doc_id] = defragged 
 
-        #token_expression = r'\w+|\$[\d\.]+\S+|\d*\.d+\)' # Lillian's regex from https://www.kite.com/python/docs/nltk.RegexpTokenizer
-        #tokenize = RegexpTokenizer(token_expression)
+          parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
 
-        #need to read file, get the content, get all the tokens, put into the tokens_list. 
+          parsed_file.get_text() # make sure beautifulsoup version >= 4.9.0  
+          tokens = ' '.join(parsed_file.stripped_strings) # words is one long string
+          # lower all the words
 
-        parsed_file.get_text() # make sure beautifulsoup version >= 4.9.0  
-        tokens = ' '.join(parsed_file.stripped_strings) # words is one long string
-        # lower all the words
+          tokens = re.split(r"[^0-9a-zA-Z]+", tokens) # puts string to list and tokenize. only accept numbers and letters 
 
-        tokens = re.split(r"[^0-9a-zA-Z]+", tokens) # puts string to list and tokenize. only accept numbers and letters 
+          tokens = lowercase(tokens)
+          # tokens = WordPunctTokenizer().tokenize(tokens) # doesn't remove foreign characters  
 
-        tokens = lowercase(tokens)
-        # tokens = WordPunctTokenizer().tokenize(tokens) # doesn't remove foreign characters  
+          #tokenizer = RegexpTokenizer(r'\w+|\$[\d\.]+\S+')
 
-        #tokenizer = RegexpTokenizer(r'\w+|\$[\d\.]+\S+')
+          # Tokenize the words and put them in the inverted index_dict 
+          #for token in tokenizer.tokenize(words):
+          for token in tokens:
+            # only add alphanumeric words to index also check if the token is in nltk corpus words
+            if token.isalnum(): 
+              stem_word = porter.stem(token)
+              # if the word is not in the index, add the doc_id + init frequency (1)
+              if stem_word not in index_dict:
+                index_dict[stem_word][doc_id] = 1
+              # Token is already in index, but we need to add NEW doc_id + init frequency(1) 
+              elif stem_word in index_dict and doc_id not in index_dict[stem_word]:
+                index_dict[stem_word][doc_id] = 1
+              # Increase the frequency if token and doc_id is in the index 
+              elif stem_word in index_dict and doc_id in index_dict[stem_word]:
+                index_dict[stem_word][doc_id] += 1
 
-        # Tokenize the words and put them in the inverted index_dict 
-        #for token in tokenizer.tokenize(words):
-        for token in tokens:
-          # only add alphanumeric words to index also check if the token is in nltk corpus words
-          if token.isalnum(): 
-            stem_word = porter.stem(token)
-            # if the word is not in the index, add the doc_id + init frequency (1)
-            if stem_word not in index_dict:
-              index_dict[stem_word][doc_id] = 1
-            # Token is already in index, but we need to add NEW doc_id + init frequency(1) 
-            elif stem_word in index_dict and doc_id not in index_dict[stem_word]:
-              index_dict[stem_word][doc_id] = 1
-            # Increase the frequency if token and doc_id is in the index 
-            elif stem_word in index_dict and doc_id in index_dict[stem_word]:
-              index_dict[stem_word][doc_id] += 1
-
-        ''' 
-        if ( doc_id % batch_threshold == 0): 
-          sort_and_write_to_disk()
-          index_dict.clear()
-          batch_number += 1
-        '''
+          ''' 
+          if ( doc_id % batch_threshold == 0): 
+            sort_and_write_to_disk()
+            index_dict.clear()
+            batch_number += 1
+          '''
   
   '''
   # check if there's anything inside the index dict to write last batch to disk
@@ -264,9 +264,9 @@ def get_tfidf_index(file_name):
         # posting[1] = { doc1: tf, doc2: tf, doc3:tf, ...}
         temp_dict = posting[1]
         for doc_num in temp_dict: 
-          # ( 1 + log(term-freq) ) * log(  # docs  / # times appear in docs ) 
-          #tfidf_score = (1 + math.log10(temp_dict[doc_num])) * math.log10(doc_id / len(temp_dict))
-          tfidf_index[doc_num] = round((1 + math.log10(temp_dict[doc_num])) * math.log10( 55393 / len(temp_dict)), 3) 
+          # ( 1 + log(term-freq) ) * log(  # docs  / # times appear in docs )
+          tfidf_index[doc_num] = round((1 + math.log10(temp_dict[doc_num])) * math.log10( doc_id / len(temp_dict)), 3) 
+          # tfidf_index[doc_num] = round((1 + math.log10(temp_dict[doc_num])) * math.log10( 55393 / len(temp_dict)), 3) 
 
         transfer_posting = (posting[0], tfidf_index) # save as a set to store to write to a new inverted_index file
         new_index_file.write( str(transfer_posting) + "\n")
