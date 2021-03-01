@@ -40,7 +40,7 @@ from sys import getsizeof
 # global keyword for all of them
 index_dict = defaultdict(dict)
 doc_id = 0
-#batch_number = 1 # set as global variable 
+batch_number = 1 # set as global variable 
 doc_map = {} # holds mapping of doc_id -> url
 position_index = {} 
 tfidf_index = {}
@@ -245,11 +245,11 @@ def merge_all():
       dict_threshold = 1000000 #1 mil bytes == 10 MB
       if getsizeof(temp_dict) > dict_threshold:
         for k, v in temp_dict.items():
-          merged_index.write(str(k) + " : " + str(v)+"\n")
+          merged_index.write("('" + str(k) + "', " + v+ ") \n")
         temp_dict.clear()
     
     for k, v in temp_dict.items():
-        merged_index.write(str(k) + " : " + str(v)+"\n")
+        merged_index.write("('" + str(k) + "', " + v +") \n")
     temp_dict.clear()
       
     
