@@ -260,33 +260,31 @@ def merge_all():
 
 # position_index is a dict { token: position}
 def get_tfidf_index(file_name):
-  # this would contain { doc_id: tf-idfscore }
-  tfidf_index = defaultdict(float) 
   # need to iterate over merged inverted_index.txt
-  with open(file_name, "r") as inverted_index_file:
-    # for every token in the document.. 
-    for line in inverted_index_file:
-      posting = ast.literal_eval(line) # ( token, {doc1: tf, doc2: tf, doc3: tf, ... } )
-      # for every doc_id we need to extract the term frequency of the token..compute the tf-idf.  
-      # posting[1] = { doc1: tf, doc2: tf, doc3:tf, ...}
-      temp_dict = posting[1]
-      for doc_num in temp_dict: 
-        # ( 1 + log(term-freq) ) * log(  # docs  / # times appear in docs ) 
-        #tfidf_score = (1 + math.log10(temp_dict[doc_num])) * math.log10(doc_id / len(temp_dict))
-        tfidf_score = (1 + math.log10(temp_dict[doc_num])) * math.log10( 55393 / len(temp_dict))
+  with open("new_inverted_index.txt", "w") as new_index_file:
+    with open(file_name, "r") as inverted_index_file:
+      # for every token in the document.. 
+      for line in inverted_index_file:
+        tfidf_index = defaultdict(float) 
+        posting = ast.literal_eval(line) # ( token, {doc1: tf, doc2: tf, doc3: tf, ... } )
+        # for every doc_id we need to extract the term frequency of the token..compute the tf-idf.  
+        # posting[1] = { doc1: tf, doc2: tf, doc3:tf, ...}
+        temp_dict = posting[1]
+        for doc_num in temp_dict: 
+          # ( 1 + log(term-freq) ) * log(  # docs  / # times appear in docs ) 
+          #tfidf_score = (1 + math.log10(temp_dict[doc_num])) * math.log10(doc_id / len(temp_dict))
+          tfidf_index[doc_num] = round((1 + math.log10(temp_dict[doc_num])) * math.log10( 55393 / len(temp_dict)), 3) 
 
-        if doc_num in tfidf_index:
-          tfidf_index[doc_num] += tfidf_score
-        else: 
-          tfidf_index[doc_num] = tfidf_score
-
+        transfer_posting = (posting[0], tfidf_index) # save as a set to store to write to a new inverted_index file
+        new_index_file.write(transfer_posting + "\n")
+        
 
   # write tfidf_index to another file?
   with open("tfidf_index.txt", "w") as tfidf_file:
     for key in sorted(tfidf_index):
       tfidf_file.write("(" + str(key) + ", " + str(round(tfidf_index[key], 3)) + ") \n" )
 
-  return tfidf_index
+  #return tfidf_index
 
 if __name__ == "__main__":
 
