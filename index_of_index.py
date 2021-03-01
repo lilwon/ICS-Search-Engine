@@ -6,7 +6,7 @@
     word from the inverted index. 
 
 '''
-import ast
+import ast 
 
 def index_of_inverted_index(file_name):
     new_index = {} # index that would return WORD @ position
