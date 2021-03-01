@@ -245,11 +245,11 @@ def merge_all():
       dict_threshold = 1000000 #1 mil bytes == 10 MB
       if getsizeof(temp_dict) > dict_threshold:
         for k, v in temp_dict.items():
-          merged_index.write("('" + str(k) + "', " + v+ ") \n")
+          merged_index.write("('" + str(k) + "', " + str(v)+ ") \n")
         temp_dict.clear()
     
     for k, v in temp_dict.items():
-        merged_index.write("('" + str(k) + "', " + v +") \n")
+        merged_index.write("('" + str(k) + "', " + str(v) +") \n")
     temp_dict.clear()
       
     
@@ -265,7 +265,7 @@ def get_tfidf_index(file_name):
     with open(file_name, "r") as inverted_index_file:
       # for every token in the document.. 
       for line in inverted_index_file:
-        tfidf_index = defaultdict(float) 
+        tfidf_index = {} 
         posting = ast.literal_eval(line) # ( token, {doc1: tf, doc2: tf, doc3: tf, ... } )
         # for every doc_id we need to extract the term frequency of the token..compute the tf-idf.  
         # posting[1] = { doc1: tf, doc2: tf, doc3:tf, ...}
@@ -276,23 +276,16 @@ def get_tfidf_index(file_name):
           tfidf_index[doc_num] = round((1 + math.log10(temp_dict[doc_num])) * math.log10( 55393 / len(temp_dict)), 3) 
 
         transfer_posting = (posting[0], tfidf_index) # save as a set to store to write to a new inverted_index file
-        new_index_file.write(transfer_posting + "\n")
+        new_index_file.write( str(transfer_posting) + "\n")
         
-
-  # write tfidf_index to another file?
-  with open("tfidf_index.txt", "w") as tfidf_file:
-    for key in sorted(tfidf_index):
-      tfidf_file.write("(" + str(key) + ", " + str(round(tfidf_index[key], 3)) + ") \n" )
-
-  #return tfidf_index
 
 if __name__ == "__main__":
 
   # call inverted_index function
   #print("Inverted index started")
-  inverted_index()
+  #inverted_index()
   #print("Inverted index finished")
-  merge_all()
+  # merge_all()
   '''
   with open("inverted_index2.txt", "w", encoding="utf-8") as report:
     sort_inverted_index = sorted(index_dict.items(), key=lambda x: x[0])
@@ -311,9 +304,9 @@ if __name__ == "__main__":
   
   # after finished merging, create an index of the inverted index
   # change filename to w.e merged inverted_index file is called
-  position_index = index_of_inverted_index("inverted_index2.txt")
+  position_index = index_of_inverted_index("merged_index.txt")
 
-  tfidf_index = get_tfidf_index("inverted_index2.txt")
+  get_tfidf_index("merged_index.txt")
 
   # get all position of inverted_index. but we want to do tf-idf of entire inverted_index
 
