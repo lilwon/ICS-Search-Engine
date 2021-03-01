@@ -133,6 +133,8 @@ def sort_and_write_to_disk():
       report.write(str(item) + "\n")
 
 
+# Found online: https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
+# dict_merge created by Paul Durivage for free use! :D
 def dict_merge(dct, merge_dct):
     """ Recursive dict merge. Inspired by :meth:``dict.update()``, instead of
     updating only top-level keys, dict_merge recurses down into dicts nested
