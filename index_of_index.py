@@ -23,4 +23,4 @@ def index_of_inverted_index(file_name):
             offset += len(line)+1
 
     # return the index of the inverted index -> { token: numPos }
-    return new_index 
+    return new_index

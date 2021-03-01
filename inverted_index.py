@@ -294,17 +294,18 @@ if __name__ == "__main__":
     # having problems saving the URL and reading with ast.literal_eval
     #  mapping.write("(" + str(key) + ", '" + doc_map[key] + "') \n" )
     json.dump(doc_map, mapping, indent=2)
-  
+
+  # get all position of inverted_index. but we want to do tf-idf of entire inverted_index
+  get_tfidf_index("inverted_index2.txt")
+
   # after finished merging, create an index of the inverted index
   # change filename to w.e merged inverted_index file is called
-  position_index = index_of_inverted_index("inverted_index2.txt")
+  position_index = index_of_inverted_index("new_inverted_index.txt")
   # Save to an output file if needed, but we can keep above in memory! (~1mil tokens)
   with open("word_offsets.txt", "w") as f2:
     for key in position_index:
       f2.write("('" + key + "', " + str(position_index[key]) + ") \n")  
 
-  # get all position of inverted_index. but we want to do tf-idf of entire inverted_index
-  get_tfidf_index("inverted_index2.txt")
  
   # dont need below to test the indexer
   '''

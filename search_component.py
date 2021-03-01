@@ -28,16 +28,15 @@ def store_in_memory(file_name):
 
 
 # Lecture 19 - Slide 34
-def retrieval(queries, offset_index, tfidf_index, docid_index):
+def retrieval(queries, offset_index, docid_index):
   #temp_list = [] 
   temp_dict = {}
   # Whoever has highest "priority" = displayed first.. 
   start_time = 0
   doc_score = defaultdict(float)
 
-  # matching_docs = set() 
   for query in queries:
-    with open("inverted_index2.txt", "r") as f:
+    with open("new_inverted_index.txt", "r") as f:
       # start timer? 
       start_time = datetime.datetime.now() 
       # check if query is in the inverted_index
@@ -61,11 +60,11 @@ def retrieval(queries, offset_index, tfidf_index, docid_index):
       # get current document from token
       doc_id_int = int(doc_id)
       if doc_id_int in temp_dict[token]:
-        temp_score = tfidf_index[doc_id_int]  
+        temp_score =  temp_dict[token][doc_id_int] 
         # check to see if the document is a .txt page ?
         # might actually need to do a re.match/re.search for these values.. 
-        if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id]:
-          temp_score *= 0.0001 
+        # if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id]:
+          #temp_score *= 0.0001 
 
         doc_score[doc_id_int] += temp_score
     
@@ -117,7 +116,7 @@ if __name__ == "__main__":
   for query in queries:
     stemmed_query.append(porter.stem(query))
 
-  res = retrieval(stemmed_query, word_offsets, tfidf_index, docid_index)
+  res = retrieval(stemmed_query, word_offsets, docid_index)
 
   print(res)
   print(type(res))

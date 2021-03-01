@@ -8,3 +8,5 @@ partial_index2.txt
 partial_index3.txt
 tfidf_index.txt
 word_offsets.txt
+merged_index.txt
+new_inverted_index.txt
