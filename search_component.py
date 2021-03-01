@@ -11,7 +11,7 @@ import json
 
 from collections import defaultdict
 from nltk.stem.snowball import SnowballStemmer
-from queue import PriorityQueue
+from nltk.corpus import stopwords
 
 # from inverted_index import doc_map, position_index, tfidf_index
 
@@ -32,7 +32,7 @@ def retrieval(queries, offset_index, docid_index):
   #temp_list = [] 
   temp_dict = {}
   # Whoever has highest "priority" = displayed first.. 
-  start_time = 0
+  start_time = datetime.datetime.now()  # set to a value if entered stopwords in query 
   doc_score = defaultdict(float)
 
   for query in queries:
@@ -107,16 +107,25 @@ if __name__ == "__main__":
       # json made item (doc_id a string) 
       testing.write( docid_index[item] + "\n")
 
-  queries = input("Enter a query: ").lower().split()
+  stop_words = stopwords.words('english')
 
-  porter = SnowballStemmer(language="english")
+  while True:
+    queries = input("Enter a query: ").lower().split()
+    porter = SnowballStemmer(language="english")
 
-  # stem the queries
-  stemmed_query= []
-  for query in queries:
-    stemmed_query.append(porter.stem(query))
+    # stem the queries
+    stemmed_query= []
+    for query in queries:
+      stemmed_query.append(porter.stem(query))
 
-  res = retrieval(stemmed_query, word_offsets, docid_index)
+    
+    clean_queries = []
+    for query in stemmed_query: 
+      if query not in stop_words:
+        clean_queries.append(query) 
 
-  print(res)
-  print(type(res))
+    res = retrieval(clean_queries, word_offsets, docid_index)
+
+    print("Display query: " + str(clean_queries))
+    print(res)
+    # print(type(res))
