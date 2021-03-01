@@ -60,11 +60,14 @@ def retrieval(queries, offset_index, docid_index):
       # get current document from token
       doc_id_int = int(doc_id)
       if doc_id_int in temp_dict[token]:
+
+        # check for fragment??
+
         temp_score =  temp_dict[token][doc_id_int] 
         # check to see if the document is a .txt page ?
         # might actually need to do a re.match/re.search for these values.. 
-        # if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id]:
-          #temp_score *= 0.0001 
+        if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id]:
+          temp_score *= 0.5 
 
         doc_score[doc_id_int] += temp_score
     
@@ -72,6 +75,15 @@ def retrieval(queries, offset_index, docid_index):
     # so the "highest score" would be the first result in PQ
 
   ret_val=sorted(doc_score.items(), key=lambda x: x[1], reverse = True)
+
+  # print(ret_val[0])
+  # print(type(ret_val[0]))
+  
+
+  url_list = []
+  # retreive the actual url here? 
+  for temp_tuple in ret_val:
+    url_list.append(docid_index[str(temp_tuple[0])])
 
   # stop timer
   stop_time = datetime.datetime.now() 
@@ -81,7 +93,7 @@ def retrieval(queries, offset_index, docid_index):
   print( str(elapsed_time.total_seconds() * 1000) + " milliseconds" )
 
   # return top 20 results.
-  return ret_val[:20] 
+  return url_list[:20] 
 
 
 if __name__ == "__main__":
@@ -102,10 +114,12 @@ if __name__ == "__main__":
   '''
 
   # everything is saved correctly.. access as a dict 
+  '''
   with open("test.txt", "w") as testing:
     for item in docid_index:
       # json made item (doc_id a string) 
       testing.write( docid_index[item] + "\n")
+  '''
 
   stop_words = stopwords.words('english')
 
@@ -127,5 +141,7 @@ if __name__ == "__main__":
     res = retrieval(clean_queries, word_offsets, docid_index)
 
     print("Display query: " + str(clean_queries))
-    print(res)
-    # print(type(res))
+
+    # show all the urls 
+    for url in res:
+      print(url)
