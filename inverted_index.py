@@ -306,8 +306,10 @@ if __name__ == "__main__":
   # save all docs as a tuple... to make it much easier to save as dict later on
   # dont have to write the mapping since it doesn't use that much in-memory
   with open("doc_id_map.txt", "w") as mapping:
-    for key in doc_map:
-      mapping.write("(" + str(key) + ", '" + doc_map[key] + "') \n" )
+    #for key in doc_map:
+    # having problems saving the URL and reading with ast.literal_eval
+    #  mapping.write("(" + str(key) + ", '" + doc_map[key] + "') \n" )
+    json.dump(doc_map, mapping, indent=2)
   
   # after finished merging, create an index of the inverted index
   # change filename to w.e merged inverted_index file is called
