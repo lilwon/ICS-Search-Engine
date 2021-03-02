@@ -41,7 +41,7 @@ from sys import getsizeof
 # global keyword for all of them
 index_dict = defaultdict(dict)
 doc_id = 0
-#batch_number = 1 # set as global variable 
+batch_number = 1 # set as global variable 
 doc_map = {} # holds mapping of doc_id -> url
 position_index = {} 
 tfidf_index = {}
@@ -63,7 +63,7 @@ def lowercase(text):
 def inverted_index(): 
   # Your index should be stored in one or more files in the file system (no databases!). <<- from instructions 
   global doc_id
-  #global batch_number 
+  global batch_number 
   batch_threshold = 18667 # 56000 files /3 = 18666.66 --> 18667 as our threshold to divide it into three parts
 
   for root, dirs, files in os.walk("./DEV"):
@@ -115,19 +115,23 @@ def inverted_index():
               elif stem_word in index_dict and doc_id in index_dict[stem_word]:
                 index_dict[stem_word][doc_id] += 1
 
-          ''' 
           if ( doc_id % batch_threshold == 0): 
             sort_and_write_to_disk()
             index_dict.clear()
             batch_number += 1
-          '''
-  
-  '''
+
   # check if there's anything inside the index dict to write last batch to disk
   if ( any(index_dict) ):
     sort_and_write_to_disk()
     index_dict.clear()
-  '''
+
+
+def sort_and_write_to_disk():
+  with open("partial_index"+str(batch_number)+".txt", "w", encoding="utf-8") as report:
+    sort_inverted_index = sorted(index_dict.items(), key=lambda x:x[0])
+    for item in sort_inverted_index:
+      report.write(str(item) + "\n")
+
 
 # Found online: https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
 # dict_merge created by Paul Durivage for free use! :D
