@@ -273,7 +273,7 @@ def get_tfidf_index(file_name):
         for doc_num in temp_dict: 
           # ( 1 + log(term-freq) ) * log(  # docs  / # times appear in docs )
           tfidf_index[doc_num] = round((1 + math.log10(temp_dict[doc_num])) * math.log10( doc_id / len(temp_dict)), 3) 
-          # tfidf_index[doc_num] = round((1 + math.log10(temp_dict[doc_num])) * math.log10( 55393 / len(temp_dict)), 3) 
+          # tfidf_index[doc_num] = round((1 + math.log10(temp_dict[doc_num])) * math.log10( 53792 / len(temp_dict)), 3) 
 
         transfer_posting = (posting[0], tfidf_index) # save as a set to store to write to a new inverted_index file
         new_index_file.write( str(transfer_posting) + "\n")
