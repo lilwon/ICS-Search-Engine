@@ -26,11 +26,12 @@ from collections import defaultdict, Mapping # when we find doc/term frequency. 
 # from nltk.corpus import words not working for some reason.. program gets stuck
 from nltk.stem.snowball import SnowballStemmer 
 from bs4 import BeautifulSoup
-from urllib.parse import urldefrag
+#from urllib.parse import urldefrag
 
 # this is for the search retrieval
 #from search_component import retrieve
 from index_of_index import index_of_inverted_index
+from important_text import important_text
 
 #This is for getting the size of the dict object when merging the dicts
 #Used for offloading the dict after 10MB
@@ -46,6 +47,7 @@ doc_map = {} # holds mapping of doc_id -> url
 position_index = {} 
 tfidf_index = {}
 doc_seen = set()
+important_text_index = defaultdict(dict)
 
 porter = SnowballStemmer(language='english') 
 # https://www.geeksforgeeks.org/snowball-stemmer-nlp/
@@ -87,6 +89,11 @@ def inverted_index():
           doc_map[doc_id] = url 
 
           parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
+
+          temp_imp_index = important_text(parsed_file) # returns { important_text: score }
+
+          for key, val in temp_imp_index.items():
+            important_text_index[key][doc_id] = val
 
           parsed_file.get_text() # make sure beautifulsoup version >= 4.9.0  
           tokens = ' '.join(parsed_file.stripped_strings) # words is one long string
@@ -293,6 +300,9 @@ if __name__ == "__main__":
     for item in sort_inverted_index:
       report.write(str(item) + "\n")
   '''
+
+  with open("important_text_inverted.txt", "w") as imp_text_file:
+    json.dump(important_text_index, imp_text_file, indent=2)
 
   # need to figure out merging files
 
