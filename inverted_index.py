@@ -40,7 +40,7 @@ from sys import getsizeof
 # global keyword for all of them
 index_dict = defaultdict(dict)
 doc_id = 0
-#batch_number = 1 # set as global variable 
+batch_number = 1 # set as global variable 
 doc_map = {} # holds mapping of doc_id -> url
 position_index = {} 
 tfidf_index = {}
@@ -218,7 +218,7 @@ def merge_all():
         line2 = partial_index_2.readline()
         line3 = partial_index_3.readline()
       elif current_term == term1[0] and current_term == term2[0] and current_term != term3[0]:
-        temp_dict[current_term] = term2[1]
+        temp_dict[current_term] = term1[1]
         dict_merge(temp_dict[current_term], term2[1])
         line1 = partial_index_1.readline()
         line2 = partial_index_2.readline()
@@ -226,7 +226,7 @@ def merge_all():
         temp_dict[current_term] = term1[1]
         line1 = partial_index_1.readline()
       elif current_term != term1[0] and current_term == term2[0] and current_term == term3[0]:
-        temp_dict[current_term] = term1[1]
+        temp_dict[current_term] = term2[1]
         dict_merge(temp_dict[current_term], term3[1])
         line2 = partial_index_2.readline()
         line3 = partial_index_3.readline()
