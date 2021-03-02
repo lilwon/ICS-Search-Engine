@@ -71,17 +71,20 @@ def inverted_index():
       doc_name = os.path.join(root, doc)
       # still doesn't remove foreign characters 
       with open(doc_name, "r", encoding='utf-8', errors='replace') as opened:
-        doc_id += 1
+        #doc_id += 1
         content = opened.read() 
         json_fields = json.loads(content)
         # map the doc_id -> url
 
         # defrag the url before we save to doc_id
-        defragged = urldefrag(json_fields['url'])
+        # defragged = urldefrag(json_fields['url']) # defrag another way
+        url = json_fields['url'] 
+        url = url.split('#')[0]
         # save to seen
-        if defragged not in doc_seen:
-          doc_seen.add(defragged)
-          doc_map[doc_id] = defragged 
+        if url not in doc_seen:
+          doc_id += 1 
+          doc_seen.add(url)
+          doc_map[doc_id] = url 
 
           parsed_file = BeautifulSoup(json_fields['content'], 'lxml') #lxml or html.parser")
 
@@ -211,7 +214,7 @@ def merge_all():
         line2 = partial_index_2.readline()
         line3 = partial_index_3.readline()
       elif current_term == term1[0] and current_term == term2[0] and current_term != term3[0]:
-        temp_dict[current_term] = term2[1]
+        temp_dict[current_term] = term1[1]
         dict_merge(temp_dict[current_term], term2[1])
         line1 = partial_index_1.readline()
         line2 = partial_index_2.readline()
@@ -219,7 +222,7 @@ def merge_all():
         temp_dict[current_term] = term1[1]
         line1 = partial_index_1.readline()
       elif current_term != term1[0] and current_term == term2[0] and current_term == term3[0]:
-        temp_dict[current_term] = term1[1]
+        temp_dict[current_term] = term2[1]
         dict_merge(temp_dict[current_term], term3[1])
         line2 = partial_index_2.readline()
         line3 = partial_index_3.readline()
@@ -278,12 +281,14 @@ if __name__ == "__main__":
   #print("Inverted index started")
   inverted_index()
   #print("Inverted index finished")
-  # merge_all()
+  merge_all()
 
+  '''
   with open("inverted_index2.txt", "w", encoding="utf-8") as report:
     sort_inverted_index = sorted(index_dict.items(), key=lambda x: x[0])
     for item in sort_inverted_index:
       report.write(str(item) + "\n")
+  '''
 
   # need to figure out merging files
 
@@ -296,7 +301,7 @@ if __name__ == "__main__":
     json.dump(doc_map, mapping, indent=2)
 
   # get all position of inverted_index. but we want to do tf-idf of entire inverted_index
-  get_tfidf_index("inverted_index2.txt")
+  get_tfidf_index("merged_index.txt")
 
   # after finished merging, create an index of the inverted index
   # change filename to w.e merged inverted_index file is called
