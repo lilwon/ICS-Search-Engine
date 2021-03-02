@@ -125,7 +125,7 @@ def inverted_index():
     sort_and_write_to_disk()
     index_dict.clear()
 
-
+# Sorts and writes partial indexes based on their batch number 
 def sort_and_write_to_disk():
   with open("partial_index"+str(batch_number)+".txt", "w", encoding="utf-8") as report:
     sort_inverted_index = sorted(index_dict.items(), key=lambda x:x[0])
@@ -151,12 +151,13 @@ def dict_merge(dct, merge_dct):
         else:
             dct[k] = merge_dct[k]
 
+# Merges the partial indexes into one giant index. Because we decided to split up our partial indexes into thirds, this merge only works for merging three opened files at once. 
 def merge_all():
   with open("partial_index1.txt", "r", encoding="utf-8") as partial_index_1, open("partial_index2.txt", "r", encoding="utf-8") as partial_index_2, open("partial_index3.txt", "r", encoding="utf-8") as partial_index_3, open("merged_index.txt", "w", encoding="utf-8") as merged_index:
     line1 = partial_index_1.readline()
     line2 = partial_index_2.readline()
     line3 = partial_index_3.readline()
-    current_term = ""
+    current_term = "" 
     temp_dict = defaultdict(dict)
     end_of_file = ("", "")
 
@@ -164,98 +165,99 @@ def merge_all():
       term1 = ()
       term2 = ()
       term3 = ()
-      
-      if line1 == "" and line2 == "" and line3 == "":
-        #print("All done")
+
+      #Checks if any of the files are finished/end of the file has been reached. 
+      # Based on how many are finished, it will compare the lines from readline() for each of the files and find the term that comes first alphabetically 
+      if line1 == "" and line2 == "" and line3 == "": # If all three files are empty or the end of the files have been reached, it will break out of the while loop
         break
-      elif line2 == "" and line2 != "" and line3 == "":
-        #print("Only line1")
+      elif line1 != "" and line2 == "" and line3 == "": # Second and third file are finished
         term1 = eval(line1)
         term2 = end_of_file
         term3 = end_of_file
         current_term = str(term1[0])
-      elif line1 != "" and line2 != "" and line3 == "":
-        #print("Line3 out")
+      elif line1 != "" and line2 != "" and line3 == "": #Third file finished
         term1 = eval(line1)
         term2 = eval(line2)
         term3 = end_of_file
         current_term = min(str(term1[0]), str(term2[0]))
-      elif line1 == "" and line2 != "" and line3 == "":
-        #print("only line2")
+      elif line1 == "" and line2 != "" and line3 == "": # First and third file are finished
         term1 = end_of_file
         term2 = eval(line2)
         term3 = end_of_file
         current_term = str(term2[0])
-      elif line1 == "" and line2 != "" and line3 != "":
-        #print("line1 out")
+      elif line1 == "" and line2 != "" and line3 != "": # First file finished
         term1 = end_of_file
         term2 = eval(line2)
         term3 = eval(line3)
         current_term = min(str(term2[0]), str(term3[0]))
-      elif line1 == "" and line2 == "" and line3 != "":
-        #print("Only line3")
+      elif line1 == "" and line2 == "" and line3 != "": # First and second file are finished
         term1 = end_of_file
         term2 = end_of_file
         term3 = eval(line3)
         current_term = str(term3[0])
-      elif line1 != "" and line2 == "" and line3 != "":
-        #print("line2 out")
+      elif line1 != "" and line2 == "" and line3 != "": # Second file finished
         term1 = eval(line1)
         term2 = end_of_file
         term3 = eval(line3)
         current_term = min(str(term1[0]), str(term1[0]))
-      else:
+      else: # None of the files are finished 
         term1 = eval(line1)
         term2 = eval(line2)
         term3 = eval(line3)
         current_term = min(str(term1[0]), str(term2[0]), str(term3[0]))
       
-      if current_term == term1[0] and current_term == term2[0] and current_term == term3[0]:
+      # Compared if the current_term is the same for any of the readline() of each file and if yes, then it will merge the postings together into the temp_dict
+      if current_term == term1[0] and current_term == term2[0] and current_term == term3[0]: #If all three files match the current_term
         temp_dict[current_term] = term1[1]
         dict_merge(temp_dict[current_term], term2[1])
         dict_merge(temp_dict[current_term], term3[1])
         line1 = partial_index_1.readline()
         line2 = partial_index_2.readline()
         line3 = partial_index_3.readline()
-      elif current_term == term1[0] and current_term == term2[0] and current_term != term3[0]:
+      elif current_term == term1[0] and current_term == term2[0] and current_term != term3[0]: #If only file1 and file2 match
         temp_dict[current_term] = term1[1]
         dict_merge(temp_dict[current_term], term2[1])
         line1 = partial_index_1.readline()
         line2 = partial_index_2.readline()
-      elif current_term == term1[0] and current_term != term2[0] and current_term != term3[0]:
+      elif current_term == term1[0] and current_term != term2[0] and current_term != term3[0]: #If only file1 matches
         temp_dict[current_term] = term1[1]
         line1 = partial_index_1.readline()
-      elif current_term != term1[0] and current_term == term2[0] and current_term == term3[0]:
+      elif current_term != term1[0] and current_term == term2[0] and current_term == term3[0]: # If only file2 and file3 match
         temp_dict[current_term] = term2[1]
         dict_merge(temp_dict[current_term], term3[1])
         line2 = partial_index_2.readline()
         line3 = partial_index_3.readline()
-      elif current_term != term1[0] and current_term != term2[0] and current_term == term3[0]:
+      elif current_term != term1[0] and current_term != term2[0] and current_term == term3[0]: # If only file3 matches
         temp_dict[current_term] = term3[1]
         line3 = partial_index_3.readline()
-      elif current_term == term1[0] and current_term != term2[0] and current_term == term3[0]:
+      elif current_term == term1[0] and current_term != term2[0] and current_term == term3[0]: # If only file1 and file3 match
         temp_dict[current_term] = term1[1]
         dict_merge(temp_dict[current_term], term3[1])
         line1 = partial_index_1.readline()
         line3 = partial_index_3.readline()
-      elif current_term != term1[0] and current_term == term2[0] and current_term != term3[0]:
+      elif current_term != term1[0] and current_term == term2[0] and current_term != term3[0]: # If only file2 matches 
         temp_dict[current_term] = term2[1]
         line2 = partial_index_2.readline()
       
+      #Once the temp_dict reaches 10MB in size, it will offload the temp_dict into the merged_index txt file
+      #Because when parsing through the partial indexes, everything was already sorted alphabetically and the postings were sorted by docID, 
+      # so no sorting is required as everything is added into the temp_dict in alnum order
       dict_threshold = 1000000 #1 mil bytes == 10 MB
       if getsizeof(temp_dict) > dict_threshold:
         for k, v in temp_dict.items():
           merged_index.write("('" + str(k) + "', " + str(v)+ ") \n")
         temp_dict.clear()
     
+    #This is used for offloading the final batch that has not reached the 10MB threshold. 
     for k, v in temp_dict.items():
         merged_index.write("('" + str(k) + "', " + str(v) +") \n")
     temp_dict.clear()
       
-    
+    #Must close all open files here
     partial_index_1.close()
     partial_index_2.close()
     partial_index_3.close()
+    merged_index.close()
 
 
 # position_index is a dict { token: position}
