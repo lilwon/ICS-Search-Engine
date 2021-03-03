@@ -28,16 +28,26 @@ def store_in_memory(file_name):
 
 
 # Lecture 19 - Slide 34
-def retrieval(queries, offset_index, docid_index):
+def retrieval(queries, important_offset, offset_index, docid_index):
   temp_dict = {}
   # Whoever has highest "priority" = displayed first.. 
-  start_time = datetime.datetime.now()  # set to a value if entered stopwords in query 
   doc_score = defaultdict(float)
+  imp_temp_dict = {}
+   # start timer here
+  start_time = datetime.datetime.now() 
+  
+  # this for loop checks for the offset of IMPORTANT texts
+  for query in queries:
+    with open("important_text_inverted.txt", "r") as f:
+      if query in important_offset:
+        pos = important_offset[query]
+        f.seek(pos)
+        posting = ast.literal_eval(f.readline())  
+        imp_temp_dict[posting[0]] = posting[1]
 
+  # this checks for all tokens in inverted_index
   for query in queries:
     with open("new_inverted_index.txt", "r") as f:
-      # start timer? 
-      start_time = datetime.datetime.now() 
       # check if query is in the inverted_index
       if query in offset_index:
         # get the position
@@ -46,8 +56,12 @@ def retrieval(queries, offset_index, docid_index):
         posting = ast.literal_eval(f.readline()) # save token and postings
         # posting[1] = { doc1: tf, doc2: tf, doc3: tf.... }
         temp_dict[posting[0]] = posting[1]
-      else:
-        print("No word found in inverted_list")
+      #else:
+      #  print("No word found in inverted_list")
+
+  # do Boolean Retrieval first? + important text ? 
+  # then calculate tf-idf scores + important text? 
+
 
   # for all documents in docid_index
   for doc_id in docid_index:
@@ -55,13 +69,17 @@ def retrieval(queries, offset_index, docid_index):
       # get current document from token
       doc_id_int = int(doc_id)
       if doc_id_int in temp_dict[token]:
-
-        # check for fragment??
-
         temp_score =  temp_dict[token][doc_id_int] 
-        # check to see if the document is a .txt page ?
-        # might actually need to do a re.match/re.search for these values.. 
-        if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id]:
+
+        # add important text to the score 
+        if token in imp_temp_dict:
+          if doc_id_int in imp_temp_dict[token]:
+            temp_score += imp_temp_dict[token][doc_id_int]
+
+        # check to see if the document is a .txt page? lower the values for these docs because they aren't valid "websites" 
+        # might actually need to do a re.match/re.search for these values..
+        if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id] \
+          or ".sql" in docid_index[doc_id]:
           temp_score *= 0.5 
 
         doc_score[doc_id_int] += temp_score
@@ -71,17 +89,15 @@ def retrieval(queries, offset_index, docid_index):
 
   # print(ret_val[0])
   # print(type(ret_val[0]))
-  
+
   url_list = []
-  # retreive the actual url here? 
+  # retreive the actual url here 
   for temp_tuple in ret_val:
     url_list.append(docid_index[str(temp_tuple[0])])
 
   # stop timer
   stop_time = datetime.datetime.now() 
-
   elapsed_time = stop_time - start_time
-
   print( str(elapsed_time.total_seconds() * 1000) + " milliseconds" )
 
   # return top 20 results.
@@ -92,6 +108,9 @@ if __name__ == "__main__":
   # need a faster way to do this..
   word_offsets = store_in_memory("word_offsets.txt") 
   # docid_index = store_in_memory("doc_id_map.txt")
+
+  important_offsets = store_in_memory("imptext_offsets.txt")
+
   docid_index = {}
   with open("doc_id_map.txt", "r") as f:
     docid_index = json.load(f)
@@ -130,7 +149,7 @@ if __name__ == "__main__":
       if query not in stop_words:
         clean_queries.append(query) 
 
-    res = retrieval(clean_queries, word_offsets, docid_index)
+    res = retrieval(clean_queries, important_offsets, word_offsets, docid_index)
 
     print("Display query: " + str(clean_queries))
 
