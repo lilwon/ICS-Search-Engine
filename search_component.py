@@ -109,7 +109,7 @@ if __name__ == "__main__":
   with open("doc_id_map.txt", "r") as f:
     docid_index = json.load(f)
 
-  tfidf_index = store_in_memory("tfidf_index.txt")
+  #tfidf_index = store_in_memory("tfidf_index.txt") #why did i save this in memory..
 
   # check if it worked
   '''

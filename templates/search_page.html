@@ -9,5 +9,19 @@
         <form action="http://127.0.0.1:5000/" method ="post">
             <input type="text" name="query">
         </form>
+
+        {% for item in query %}
+        <li style="display:inline" >{{ item }} </li>
+        {% endfor %}
+
+        <p>Timer: {{ timer }} milliseconds </p>
+
+        <table border = 1>
+            {% for item in results %}
+            <tr>
+                <th> {{ item }} </th>
+            </tr>
+           {% endfor %}
+        </table>
    </body>
 </html>
