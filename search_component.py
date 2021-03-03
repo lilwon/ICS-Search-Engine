@@ -59,6 +59,10 @@ def retrieval(queries, important_offset, offset_index, docid_index):
       #else:
       #  print("No word found in inverted_list")
 
+  # do Boolean Retrieval first? + important text ? 
+  # then calculate tf-idf scores + important text? 
+
+
   # for all documents in docid_index
   for doc_id in docid_index:
     for token in temp_dict:
@@ -68,12 +72,14 @@ def retrieval(queries, important_offset, offset_index, docid_index):
         temp_score =  temp_dict[token][doc_id_int] 
 
         # add important text to the score 
-        if doc_id_int in imp_temp_dict[token]:
-          temp_score += imp_temp_dict[token][doc_id_int]
+        if token in imp_temp_dict:
+          if doc_id_int in imp_temp_dict[token]:
+            temp_score += imp_temp_dict[token][doc_id_int]
 
         # check to see if the document is a .txt page? lower the values for these docs because they aren't valid "websites" 
         # might actually need to do a re.match/re.search for these values..
-        if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id]:
+        if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id] \
+          or ".sql" in docid_index[doc_id]:
           temp_score *= 0.5 
 
         doc_score[doc_id_int] += temp_score
