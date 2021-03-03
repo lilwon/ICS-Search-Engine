@@ -5,6 +5,10 @@ from bs4 import BeautifulSoup # to get soup object
 from nltk.stem.snowball import SnowballStemmer
 
 # wouldn't let me import from inverted_index >:( 
+'''
+    Takes in a list object then lowercases every element in that list 
+    Returns a list.
+'''
 def lowercase(text):
   lower_text = [] 
   for word in text:
@@ -21,10 +25,12 @@ def important_text(parsed_file):
     porter = SnowballStemmer(language='english')
 
     b_tokens = [] # used to create a list of strings
+    # we append a string found in every tag to a list
     for item in parsed_file.find_all('b'):
         b_tokens.append(' '.join(item.find_all(text=True)))
-    b_string = ' '.join(b_tokens) # create one long string of all B texts 
+    b_string = ' '.join(b_tokens) # merge the lists to create a string of all B texts 
 
+    # Read b_tokens code to understand 
     s_tokens = []
     for item in parsed_file.find_all('strong'):
         s_tokens.append(' '.join(item.find_all(text=True)))
@@ -45,10 +51,10 @@ def important_text(parsed_file):
         h3_tokens.append(' '.join(item.find_all(text=True)))
     h3_string = ' '.join(h3_tokens) # create one long string of all h3 texts 
 
-    # might need it to be a {token1: weight, token2:}
-    final_dict = {} # token : weighted_val
+    final_dict = {} # {token: some_val, token2: some_val,...}
     val_return = {} 
 
+    # tokenize the strings and add to final_dict
     b_tokens =re.split(r"[^0-9a-zA-Z]+", b_string)
     b_tokens = lowercase(b_tokens) 
     for term in b_tokens:
@@ -102,7 +108,7 @@ def important_text(parsed_file):
             else:
                 final_dict[stem_term] = 2 
 
-
+    # log10 every word to create the final weight of that token in the doc
     for key,val in final_dict.items():
         val_return[key] = math.log10(val)
 

@@ -1,9 +1,7 @@
 '''
     Search Retrieval component. Does the search queries and stuff.
 
-    Will possibly do document at a time query instead of term at a time
-    Lecture 19 - Slide 34 for pseudocode
-
+    Implements document at a time retrieval.
 '''
 import ast
 import datetime
@@ -12,8 +10,6 @@ import json
 from collections import defaultdict
 from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import stopwords
-
-# from inverted_index import doc_map, position_index, tfidf_index
 
 # returns a dictionary from files created by indexer
 def store_in_memory(file_name):
@@ -26,11 +22,9 @@ def store_in_memory(file_name):
 
   return vals
 
-
-# Lecture 19 - Slide 34
+# Retrieval takes the query and ranks the url
 def retrieval(queries, important_offset, offset_index, docid_index):
   temp_dict = {}
-  # Whoever has highest "priority" = displayed first.. 
   doc_score = defaultdict(float)
   imp_temp_dict = {}
    # start timer here
@@ -147,7 +141,7 @@ if __name__ == "__main__":
     clean_queries = []
     for query in stemmed_query: 
       if query not in stop_words:
-        clean_queries.append(query) 
+        clean_queries.append(query.lower()) 
 
     res = retrieval(clean_queries, important_offsets, word_offsets, docid_index)
 
