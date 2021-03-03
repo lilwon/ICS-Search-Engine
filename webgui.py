@@ -106,6 +106,8 @@ def retrieval(queries):
 @app.route('/', methods=['GET', 'POST'])
 def search_page():
     results = []
+    queries = []
+    timer = 0 
     # Gets the search form from HTML  
     if request.method == 'POST':
         queries = request.form['query'] # get the user queries 
