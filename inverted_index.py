@@ -302,8 +302,9 @@ if __name__ == "__main__":
   '''
 
   with open("important_text_inverted.txt", "w") as imp_text_file:
-    json.dump(important_text_index, imp_text_file, indent=2)
-
+    sorted_imp_text = sorted(important_text_index.items(), key = lambda x: x[0])
+    for item in sorted_imp_text:
+      imp_text_file.write(str(item) + "\n")
   # need to figure out merging files
 
   # save all docs as a tuple... to make it much easier to save as dict later on
@@ -325,13 +326,8 @@ if __name__ == "__main__":
     for key in position_index:
       f2.write("('" + key + "', " + str(position_index[key]) + ") \n")  
 
- 
-  # dont need below to test the indexer
-  '''
-  while True:
-    docs_set = retrieve(index_dict)
-    docs_list = list(docs_set)[:5] # get top 5 links
 
-    for item in docs_list:
-      print(doc_map[item])
-  ''' 
+  imptext_position_index = index_of_inverted_index("important_text_inverted.txt")
+  with open("imptext_offsets.txt","w") as f3:
+    for key in imptext_position_index:
+     f3.write("('" + key + "', " + str(imptext_position_index[key]) + ") \n")  

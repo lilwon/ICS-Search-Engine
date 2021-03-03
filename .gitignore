@@ -10,3 +10,5 @@ tfidf_index.txt
 word_offsets.txt
 merged_index.txt
 new_inverted_index.txt
+important_text_inverted.txt
+imptext_offsets.txt
