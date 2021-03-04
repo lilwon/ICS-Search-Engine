@@ -24,6 +24,11 @@ def lowercase(text):
 def important_text(parsed_file):
     porter = SnowballStemmer(language='english')
 
+    t_tokens = []
+    for item in parsed_file.find_all('title'):
+        t_tokens.append(' '.join(item.find_all(text=True)))
+    t_string = ' '.join(t_tokens) # merge the lists to create a string of all B texts 
+
     b_tokens = [] # used to create a list of strings
     # we append a string found in every tag to a list
     for item in parsed_file.find_all('b'):
@@ -52,7 +57,17 @@ def important_text(parsed_file):
     h3_string = ' '.join(h3_tokens) # create one long string of all h3 texts 
 
     final_dict = {} # {token: some_val, token2: some_val,...}
-    val_return = {} 
+    val_return = {}
+
+    t_tokens =re.split(r"[^0-9a-zA-Z]+", t_string)
+    t_tokens = lowercase(t_tokens) 
+    for term in b_tokens:
+        if term.isalnum():
+            stem_term = porter.stem(term)
+            if stem_term in final_dict:
+                final_dict[stem_term] += 10
+            else:
+                final_dict[stem_term] = 10 
 
     # tokenize the strings and add to final_dict
     b_tokens =re.split(r"[^0-9a-zA-Z]+", b_string)
@@ -61,9 +76,9 @@ def important_text(parsed_file):
         if term.isalnum():
             stem_term = porter.stem(term)
             if stem_term in final_dict:
-                final_dict[stem_term] += 6
+                final_dict[stem_term] += 5
             else:
-                final_dict[stem_term] = 6
+                final_dict[stem_term] = 5
         
     
     s_tokens =re.split(r"[^0-9a-zA-Z]+", s_string)
@@ -72,9 +87,9 @@ def important_text(parsed_file):
         if term.isalnum():
             stem_term = porter.stem(term)
             if stem_term in final_dict:
-                final_dict[stem_term] += 5
+                final_dict[stem_term] += 6
             else:
-                final_dict[stem_term] = 5
+                final_dict[stem_term] = 6
 
     
     h1_tokens =re.split(r"[^0-9a-zA-Z]+", h1_string)

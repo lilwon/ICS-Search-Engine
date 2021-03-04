@@ -288,7 +288,7 @@ if __name__ == "__main__":
   '''
 
   # Create an inverted index file for important texts
-  with open("important_text_inverted.txt", "w") as imp_text_file:
+  with open("important_text_inverted.txt", "w", encoding="utf-8") as imp_text_file:
     sorted_imp_text = sorted(important_text_index.items(), key = lambda x: x[0])
     for item in sorted_imp_text:
       imp_text_file.write(str(item) + "\n")

@@ -30,6 +30,7 @@ def retrieval(queries, important_offset, offset_index, docid_index):
   start_time = datetime.datetime.now() 
   
   # this for loop checks for the offset of IMPORTANT texts
+  '''
   for query in queries:
     with open("important_text_inverted.txt", "r") as f:
       if query in important_offset:
@@ -50,14 +51,41 @@ def retrieval(queries, important_offset, offset_index, docid_index):
         # posting[1] = { doc1: tf, doc2: tf, doc3: tf.... }
         temp_dict[posting[0]] = posting[1]
       #else:
-      #  print("No word found in inverted_list")
+  '''
+  matching_docs = set()
+
+
+  with open("important_text_inverted.txt", "r") as f, open("new_inverted_index.txt", "r") as g:
+    for query in queries:
+      if query in important_offset:
+        pos = important_offset[query]
+        f.seek(pos)
+        posting = eval(f.readline())
+        imp_temp_dict[posting[0]] = posting[1]
+      
+      if query in offset_index:
+        pos = offset_index[query]
+        g.seek(pos)
+        posting = eval(g.readline())
+        temp_dict[posting[0]] = posting[1]
 
   # do Boolean Retrieval first? + important text ? 
   # then calculate tf-idf scores + important text? 
+  # temp_dict: { token1: {docid1: tfidf...}, token2: {docid2: tfidf }}
 
+  # 1000 docids?  
+
+  temp_docids = set() # union/or 
+  for key in temp_dict.values():
+    for some_docid in key.keys():
+        temp_docids.add(some_docid) 
+
+  temp_docids = sorted(list(temp_docids))
+
+  print(str(len(temp_docids)))
 
   # for all documents in docid_index
-  for doc_id in docid_index:
+  for doc_id in temp_docids:
     for token in temp_dict:
       # get current document from token
       doc_id_int = int(doc_id)
@@ -71,17 +99,14 @@ def retrieval(queries, important_offset, offset_index, docid_index):
 
         # check to see if the document is a .txt page? lower the values for these docs because they aren't valid "websites" 
         # might actually need to do a re.match/re.search for these values..
-        if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id] \
-          or ".sql" in docid_index[doc_id]:
-          temp_score *= 0.5 
+        #if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id] \
+        #  or ".sql" in docid_index[doc_id]:
+        #  temp_score *= 0.5 
 
         doc_score[doc_id_int] += temp_score
 
   # sort values to get best score first
-  ret_val=sorted(doc_score.items(), key=lambda x: x[1], reverse = True)
-
-  # print(ret_val[0])
-  # print(type(ret_val[0]))
+  ret_val=sorted(doc_score.items(), key=lambda x: x[1], reverse = True)[:20]
 
   url_list = []
   # retreive the actual url here 
@@ -94,7 +119,7 @@ def retrieval(queries, important_offset, offset_index, docid_index):
   print( str(elapsed_time.total_seconds() * 1000) + " milliseconds" )
 
   # return top 20 results.
-  return url_list[:20] 
+  return url_list 
 
 
 if __name__ == "__main__":

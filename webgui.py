@@ -57,6 +57,9 @@ def retrieval(queries):
     # do Boolean Retrieval first? + important text ? 
     # then calculate tf-idf scores + important text? 
 
+    # temp_dict: { token1: {docid1: tfidf...}, token2: {docid2: tfidf }}
+    # take the doc_id keys from the temp_dict..
+    # have a set to hold it
 
     # for all documents in docid_index
     for doc_id in docid_index:
