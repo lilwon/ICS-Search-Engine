@@ -5,7 +5,7 @@ from collections import defaultdict
 from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import stopwords
 
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, render_template
 app = Flask(__name__) # used for app route 
 
 # global in memory dictionaries for fast seek

@@ -307,6 +307,15 @@ if __name__ == "__main__":
   # Create an index of the inverted_index for seek(). used in retrieval
   position_index = index_of_inverted_index("new_inverted_index.txt")
   # Save to an output file if needed, but we can keep above in memory! (~1mil tokens)
+
+  with open("word_offsets.txt", "w") as f2:
+    json.dump(position_index, f2, indent=2)
+
+  imptext_position_index = index_of_inverted_index("important_text_inverted.txt")
+  with open("imptext_offsets.txt", "w") as f3:
+    json.dump(imptext_position_index, f3, indent=2)
+
+  '''
   with open("word_offsets.txt", "w") as f2:
     for key in position_index:
       f2.write("('" + key + "', " + str(position_index[key]) + ") \n")  
@@ -316,3 +325,4 @@ if __name__ == "__main__":
   with open("imptext_offsets.txt","w") as f3:
     for key in imptext_position_index:
      f3.write("('" + key + "', " + str(imptext_position_index[key]) + ") \n")  
+  '''   

@@ -52,9 +52,6 @@ def retrieval(queries, important_offset, offset_index, docid_index):
         temp_dict[posting[0]] = posting[1]
       #else:
   '''
-  matching_docs = set()
-
-
   with open("important_text_inverted.txt", "r") as f, open("new_inverted_index.txt", "r") as g:
     for query in queries:
       if query in important_offset:
@@ -69,11 +66,13 @@ def retrieval(queries, important_offset, offset_index, docid_index):
         posting = eval(g.readline())
         temp_dict[posting[0]] = posting[1]
 
+
   # do Boolean Retrieval first? + important text ? 
   # then calculate tf-idf scores + important text? 
   # temp_dict: { token1: {docid1: tfidf...}, token2: {docid2: tfidf }}
 
-  # 1000 docids?  
+  # 10000 docids?  
+  #start_time = datetime.datetime.now() 
 
   temp_docids = set() # union/or 
   for key in temp_dict.values():
@@ -82,10 +81,11 @@ def retrieval(queries, important_offset, offset_index, docid_index):
 
   temp_docids = sorted(list(temp_docids))
 
-  print(str(len(temp_docids)))
+
+  temp_dict = dict(sorted(temp_dict.items(), key = lambda x:len(x[1])))
 
   # for all documents in docid_index
-  for doc_id in temp_docids:
+  for doc_id in docid_index:
     for token in temp_dict:
       # get current document from token
       doc_id_int = int(doc_id)
@@ -96,17 +96,16 @@ def retrieval(queries, important_offset, offset_index, docid_index):
         if token in imp_temp_dict:
           if doc_id_int in imp_temp_dict[token]:
             temp_score += imp_temp_dict[token][doc_id_int]
-
         # check to see if the document is a .txt page? lower the values for these docs because they aren't valid "websites" 
         # might actually need to do a re.match/re.search for these values..
-        #if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id] \
-        #  or ".sql" in docid_index[doc_id]:
+        # Below only works well on not stop words..
+        #if ".txt" in docid_index[str(doc_id)] or "datasets" in docid_index[str(doc_id)] or ".sql" in docid_index[str(doc_id)]:
         #  temp_score *= 0.5 
 
         doc_score[doc_id_int] += temp_score
 
   # sort values to get best score first
-  ret_val=sorted(doc_score.items(), key=lambda x: x[1], reverse = True)[:20]
+  ret_val=sorted(doc_score.items(), key=lambda x: x[1], reverse = True)[:10]
 
   url_list = []
   # retreive the actual url here 
@@ -119,19 +118,29 @@ def retrieval(queries, important_offset, offset_index, docid_index):
   print( str(elapsed_time.total_seconds() * 1000) + " milliseconds" )
 
   # return top 20 results.
-  return url_list 
+  return url_list
 
 
 if __name__ == "__main__":
   # need a faster way to do this..
-  word_offsets = store_in_memory("word_offsets.txt") 
+  #word_offsets = store_in_memory("word_offsets.txt") 
   # docid_index = store_in_memory("doc_id_map.txt")
 
-  important_offsets = store_in_memory("imptext_offsets.txt")
+  #important_offsets = store_in_memory("imptext_offsets.txt")
+
+  word_offsets = {}
+  with open("word_offsets.txt", "r") as words:
+    word_offsets = json.load(words)
+
+  important_offsets = {}
+  with open("imptext_offsets.txt", "r") as offsets:
+    important_offsets = json.load(offsets)
 
   docid_index = {}
   with open("doc_id_map.txt", "r") as f:
     docid_index = json.load(f)
+
+  print(str(type(word_offsets)))
 
   #tfidf_index = store_in_memory("tfidf_index.txt") #why did i save this in memory..
 
@@ -139,7 +148,7 @@ if __name__ == "__main__":
   '''
   with open("test.txt", "w") as testing:
     for key in docid_index:
-      #testing.write("{" + key + ": " + str(docid_index[key]) + "} \n") 
+      testing.write("{" + key + ": " + str(docid_index[key]) + "} \n") 
   '''
 
   # everything is saved correctly.. access as a dict 
@@ -157,33 +166,21 @@ if __name__ == "__main__":
     porter = SnowballStemmer(language="english")
 
     # stem the queries
-    stemmed_query= set()
+    stemmed_query= []
     for query in queries:
-      stemmed_query.add(porter.stem(query))
+      stemmed_query.append(porter.stem(query))
 
-    stopword_count = 0
-    for query in stemmed_query:
-      if query in stop_words:
-        stopword_count += 1
+    
+    clean_queries = []
+    for query in stemmed_query: 
+      if query not in stop_words:
+        clean_queries.append(query.lower()) 
 
-    stemmed_query = list(stemmed_query)
-
-    print(str(stopword_count))
-    print(len(stemmed_query))
-
-    check_query = [] 
-    if float(stopword_count/len(stemmed_query)) <= 0.50:
-      print("Removing stop words")
-      for query in stemmed_query:
-        if query not in stop_words:
-          check_query.append(query)
-    else:
-      print("Not removing stop_words")
-      check_query = stemmed_query
+    sorted(check_query)
 
     res = retrieval(check_query, important_offsets, word_offsets, docid_index)
 
-    print("Display query: " + str(check_query))
+    print("Display query: " + str(clean_queries))
 
     # show all the urls 
     for url in res:
