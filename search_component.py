@@ -132,19 +132,33 @@ if __name__ == "__main__":
     porter = SnowballStemmer(language="english")
 
     # stem the queries
-    stemmed_query= []
+    stemmed_query= set()
     for query in queries:
-      stemmed_query.append(porter.stem(query))
+      stemmed_query.add(porter.stem(query))
 
-    
-    clean_queries = []
-    for query in stemmed_query: 
-      if query not in stop_words:
-        clean_queries.append(query.lower()) 
+    stopword_count = 0
+    for query in stemmed_query:
+      if query in stop_words:
+        stopword_count += 1
 
-    res = retrieval(clean_queries, important_offsets, word_offsets, docid_index)
+    stemmed_query = list(stemmed_query)
 
-    print("Display query: " + str(clean_queries))
+    print(str(stopword_count))
+    print(len(stemmed_query))
+
+    check_query = [] 
+    if float(stopword_count/len(stemmed_query)) <= 0.50:
+      print("Removing stop words")
+      for query in stemmed_query:
+        if query not in stop_words:
+          check_query.append(query)
+    else:
+      print("Not removing stop_words")
+      check_query = stemmed_query
+
+    res = retrieval(check_query, important_offsets, word_offsets, docid_index)
+
+    print("Display query: " + str(check_query))
 
     # show all the urls 
     for url in res:

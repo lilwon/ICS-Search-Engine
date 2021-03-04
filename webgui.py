@@ -107,22 +107,38 @@ def search_page():
     results = []
     queries = []
     timer = 0 
+
+    stop_words = stopwords.words('english')
+
     # Gets the search form from HTML  
     if request.method == 'POST':
         queries = request.form['query'] # get the user queries 
         queries = queries.lower().split()
-        stemmed_query = []
+
+        stemmed_query = set() 
         for query in queries:
-            stemmed_query.append(stemmer.stem(query))
+            stemmed_query.add(stemmer.stem(query))
 
-        # comment stop words implementation for now
-        stop_words = stopwords.words('english')
-        clean_queries = []
+        # systematically remove stop words from queries if possible
+        stopword_count = 0
         for query in stemmed_query:
-           if query not in stop_words:
-            clean_queries.append(query)
+            if query in stop_words:
+                stopword_count += 1
 
-        results, timer = retrieval(clean_queries) 
+        stemmed_query = list(stemmed_query)
+
+        check_query = []
+        # calculate if stopwords are more prevalent than other words
+        if float(stopword_count/len(stemmed_query)) <= 0.50: 
+            # remove the stop words from query
+            for query in stemmed_query:
+                if query not in stop_words:
+                    check_query.append(query)
+        else: # keep all the stopwords :(
+            check_query = stemmed_query
+
+
+        results, timer = retrieval(check_query) 
 
     return render_template("search_page.html", query=queries, timer=round(timer, 2), results=results)
 
