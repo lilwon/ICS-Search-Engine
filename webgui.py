@@ -14,6 +14,7 @@ word_offsets = {}
 important_offsets = {}
 docid_index = {}
 
+# wasn't sure if this was taking too much time. So used json.load instead
 def store_in_memory(file_name):
     vals = {}
     with open(file_name, "r") as f:
@@ -95,7 +96,7 @@ def retrieval(queries):
     elapsed_time = stop_time - start_time
     print( str(elapsed_time.total_seconds() * 1000) + " milliseconds" )
 
-    # return top 20 results.
+    # return top 10 results.
     return url_list, elapsed_time.total_seconds() * 1000
 
 
@@ -114,6 +115,10 @@ def search_page():
     if request.method == 'POST':
         queries = request.form['query'] # get the user queries 
         queries = queries.lower().split()
+
+        if not queries:
+            # if user didnt enter anything return
+            return render_template("search_page.html", query=queries, timer=round(timer, 2), results=results)        
 
         stemmed_query = set() 
         for query in queries:

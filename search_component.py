@@ -170,6 +170,8 @@ if __name__ == "__main__":
     for query in queries:
       stemmed_query.add(porter.stem(query))
 
+    print(stemmed_query)
+
     stopword_count = 0
     for query in stemmed_query:
       if query in stop_words: 
