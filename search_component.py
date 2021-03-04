@@ -85,7 +85,7 @@ def retrieval(queries, important_offset, offset_index, docid_index):
   temp_dict = dict(sorted(temp_dict.items(), key = lambda x:len(x[1])))
 
   # for all documents in docid_index
-  for doc_id in docid_index:
+  for doc_id in temp_docids:
     for token in temp_dict:
       # get current document from token
       doc_id_int = int(doc_id)
@@ -166,21 +166,32 @@ if __name__ == "__main__":
     porter = SnowballStemmer(language="english")
 
     # stem the queries
-    stemmed_query= []
+    stemmed_query = set() 
     for query in queries:
-      stemmed_query.append(porter.stem(query))
+      stemmed_query.add(porter.stem(query))
 
-    
-    clean_queries = []
-    for query in stemmed_query: 
-      if query not in stop_words:
-        clean_queries.append(query.lower()) 
+    stopword_count = 0
+    for query in stemmed_query:
+      if query in stop_words: 
+        stopword_count += 1 
+
+    stemmed_query = list(stemmed_query)
+
+    check_query = [] 
+    if float(stopword_count/len(stemmed_query)) <= 0.50:
+      # remove stop words from query
+      for query in stemmed_query: 
+        if query not in stop_words:
+          check_query.append(query)
+    else:
+      # keep the stop words :( 
+      check_query = stemmed_query
 
     sorted(check_query)
 
     res = retrieval(check_query, important_offsets, word_offsets, docid_index)
 
-    print("Display query: " + str(clean_queries))
+    print("Display query: " + str(check_query))
 
     # show all the urls 
     for url in res:

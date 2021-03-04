@@ -30,60 +30,57 @@ def retrieval(queries):
     imp_temp_dict = {}
     # start timer here
     start_time = datetime.datetime.now() 
-  
-    # this for loop checks for the offset of IMPORTANT texts
-    for query in queries:
-        with open("important_text_inverted.txt", "r") as f:
-            if query in important_offset:
-                pos = important_offset[query]
+
+    with open("important_text_inverted.txt", "r") as f, open("new_inverted_index.txt", "r") as g:
+        for query in queries:
+            if query in important_offsets:
+                pos = important_offsets[query]
                 f.seek(pos)
-                posting = eval(f.readline())  
+                posting = eval(f.readline())
                 imp_temp_dict[posting[0]] = posting[1]
 
-    # this checks for all tokens in inverted_index
-    for query in queries:
-        with open("new_inverted_index.txt", "r") as f:
-          # check if query is in the inverted_index
-           if query in word_offsets:
-                #get the position
+            if query in word_offsets:
                 pos = word_offsets[query]
-                f.seek(pos) # move the file pointer to location on file
-                posting = eval(f.readline()) # save token and postings
-                # posting[1] = { doc1: tf, doc2: tf, doc3: tf.... }
+                g.seek(pos)
+                posting = eval(g.readline())
                 temp_dict[posting[0]] = posting[1]
-           #else:
-                #  print("No word found in inverted_list")
 
-    # do Boolean Retrieval first? + important text ? 
-    # then calculate tf-idf scores + important text? 
 
     # temp_dict: { token1: {docid1: tfidf...}, token2: {docid2: tfidf }}
     # take the doc_id keys from the temp_dict..
     # have a set to hold it
+    temp_docids = set() 
+    for key in temp_dict.values():
+        for some_docid in key.keys():
+            temp_docids.add(some_docid)
 
-    # for all documents in docid_index
-    for doc_id in docid_index:
+    temp_docids = sorted(list(temp_docids))
+
+    temp_dict = dict(sorted(temp_dict.items(), key=lambda x:len(x[1]))) 
+
+    # for all documents in from temporary doc_ids
+    # no longer searching through all documents, only relevant ones   
+    for doc_id in temp_docids:
         for token in temp_dict:
         # get current document from token
-            doc_id_int = int(doc_id)
-            if doc_id_int in temp_dict[token]:
-                temp_score =  temp_dict[token][doc_id_int] 
+            if doc_id in temp_dict[token]:
+                temp_score =  temp_dict[token][doc_id] 
 
                 # add important text to the score 
                 if token in imp_temp_dict:
-                    if doc_id_int in imp_temp_dict[token]:
-                        temp_score += imp_temp_dict[token][doc_id_int]
+                    if doc_id in imp_temp_dict[token]:
+                        temp_score += imp_temp_dict[token][doc_id]
 
                 # check to see if the document is a .txt page? lower the values for these docs because they aren't valid "websites" 
-                # might actually need to do a re.match/re.search for these values..
-                if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id] \
-                or ".sql" in docid_index[doc_id]:
-                    temp_score *= 0.5 
+                # below takes too much time since it searches 55k docs 
+                #if ".txt" in docid_index[doc_id] or "datasets" in docid_index[doc_id] \
+                #or ".sql" in docid_index[doc_id]:
+                #    temp_score *= 0.5 
 
-                doc_score[doc_id_int] += temp_score
+                doc_score[doc_id] += temp_score
 
     # sort values to get best score first
-    ret_val=sorted(doc_score.items(), key=lambda x: x[1], reverse = True)
+    ret_val=sorted(doc_score.items(), key=lambda x: x[1], reverse = True)[:10]
 
     # print(ret_val[0])
     # print(type(ret_val[0]))
@@ -99,7 +96,7 @@ def retrieval(queries):
     print( str(elapsed_time.total_seconds() * 1000) + " milliseconds" )
 
     # return top 20 results.
-    return url_list[:20], elapsed_time.total_seconds() * 1000
+    return url_list, elapsed_time.total_seconds() * 1000
 
 
 
@@ -140,7 +137,6 @@ def search_page():
         else: # keep all the stopwords :(
             check_query = stemmed_query
 
-
         results, timer = retrieval(check_query) 
 
     return render_template("search_page.html", query=queries, timer=round(timer, 2), results=results)
@@ -150,8 +146,13 @@ def search_page():
 # This is so you can just do py -3 webgui.py
 if __name__ == '__main__':
     # store data in memory
-    word_offsets = store_in_memory("word_offsets.txt")
-    important_offset = store_in_memory("imptext_offsets.txt")
+    #word_offsets = store_in_memory("word_offsets.txt")
+    with open("word_offsets.txt", "r") as offset1:
+        word_offsets = json.load(offset1)
+
+    #important_offset = store_in_memory("imptext_offsets.txt")
+    with open("imptext_offsets.txt", "r") as offset2:
+        important_offsets = json.load(offset2)
 
     with open("doc_id_map.txt", "r") as f:
         docid_index = json.load(f)
