@@ -16,7 +16,6 @@ Verify which are the relevant HTML tags to select the important words.
 import json 
 import os # https://www.tutorialspoint.com/python/os_walk.htm
 import re
-import ast
 import math
 
 
@@ -260,7 +259,7 @@ def get_tfidf_index(file_name):
       # for every token in the document.. 
       for line in inverted_index_file:
         tfidf_index = {} 
-        posting = ast.literal_eval(line) # ( token, {doc1: tf, doc2: tf, doc3: tf, ... } )
+        posting = eval(line) # ( token, {doc1: tf, doc2: tf, doc3: tf, ... } )
         # for every doc_id we need to extract the term frequency of the token..compute the tf-idf.  
         # posting[1] = { doc1: tf, doc2: tf, doc3:tf, ...}
         temp_dict = posting[1]

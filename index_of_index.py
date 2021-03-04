@@ -6,7 +6,6 @@
     word from the inverted index. 
 
 '''
-import ast 
 
 def index_of_inverted_index(file_name):
     new_index = {} # index that would return WORD @ position
@@ -16,7 +15,7 @@ def index_of_inverted_index(file_name):
     with open(file_name, "r") as f:
         for line in f:
             # get the file's current line information
-            posting = ast.literal_eval(line)
+            posting = eval(line)
             # save the token and position to a new dict
             new_index[posting[0]] = offset
             # move offset (file pointer position)

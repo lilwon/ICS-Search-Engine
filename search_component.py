@@ -3,7 +3,6 @@
 
     Implements document at a time retrieval.
 '''
-import ast
 import datetime
 import json 
 
@@ -17,7 +16,7 @@ def store_in_memory(file_name):
   with open(file_name, "r") as f:
     # for every line in file, save the key and value into dictionary
     for line in f:
-      some_dict = ast.literal_eval(line)
+      some_dict = eval(line)
       vals[some_dict[0]] = some_dict[1]
 
   return vals
@@ -36,7 +35,7 @@ def retrieval(queries, important_offset, offset_index, docid_index):
       if query in important_offset:
         pos = important_offset[query]
         f.seek(pos)
-        posting = ast.literal_eval(f.readline())  
+        posting = eval(f.readline())  
         imp_temp_dict[posting[0]] = posting[1]
 
   # this checks for all tokens in inverted_index
@@ -47,7 +46,7 @@ def retrieval(queries, important_offset, offset_index, docid_index):
         # get the position
         pos = offset_index[query]
         f.seek(pos) # move the file pointer to location on file
-        posting = ast.literal_eval(f.readline()) # save token and postings
+        posting = eval(f.readline()) # save token and postings
         # posting[1] = { doc1: tf, doc2: tf, doc3: tf.... }
         temp_dict[posting[0]] = posting[1]
       #else:
