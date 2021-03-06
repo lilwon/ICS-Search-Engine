@@ -8,6 +8,32 @@ Milestone 3: Working Prototype of a Search Engine <br>
 
 
 
+
+## Files needed to run the Search Engine 
+
+The following files should be created from our indexer prior to starting the search engine: 
+1.doc_id_map.txt
+
+2. important_text_inverted.txt
+
+3. imptext_offsets.txt
+
+4.merged_index.txt
+
+5. new_inverted_index.txt
+ 
+6. partial_index_1.txt
+ 
+7. partial_index_2.txt
+
+8. partial_index_3.txt
+
+9.word_offsets.txt
+      
+ 
+
+
+
 ## Starting up the Search Engine
 **Only do this if it's necessary** <br>
 Follow the [Flask installation page](https://flask.palletsprojects.com/en/1.1.x/installation/) 
