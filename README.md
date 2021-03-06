@@ -25,7 +25,7 @@ Install the following python libraries through the command prompt:<br>
 9. word_offsets.txt<br>
  
 
-To run the indexer (on Windows), run the command prompt and input py -3 inverted_index.py <br> 
+To run the indexer (on Windows), run the command prompt and input `py -3 inverted_index.py` <br> 
 
 ## Starting up the Search Engine
 **Only do this if it's necessary** <br>
