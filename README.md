@@ -9,7 +9,8 @@ Milestone 3: Working Prototype of a Search Engine <br>
 
 
 
-The following files should be created from our indexer prior to starting the search engine: 
+The following files should be created from our indexer prior to starting the search engine:<br>
+
 1.doc_id_map.txt
 
 2. important_text_inverted.txt
