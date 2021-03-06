@@ -11,23 +11,15 @@ Milestone 3: Working Prototype of a Search Engine <br>
 
 The following files should be created from our indexer prior to starting the search engine:<br>
 
-1.doc_id_map.txt
-
-2. important_text_inverted.txt
-
-3. imptext_offsets.txt
-
-4.merged_index.txt
-
-5. new_inverted_index.txt
- 
-6. partial_index_1.txt
- 
-7. partial_index_2.txt
-
-8. partial_index_3.txt
-
-9.word_offsets.txt
+1.doc_id_map.txt<br>
+2. important_text_inverted.txt<br>
+3. imptext_offsets.txt<br>
+4.merged_index.txt<br>
+5. new_inverted_index.txt<br>
+6. partial_index_1.txt<br>
+7. partial_index_2.txt<br>
+8. partial_index_3.txt<br>
+9.word_offsets.txt<br>
  
 
 
