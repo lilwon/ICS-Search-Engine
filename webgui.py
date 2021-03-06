@@ -35,12 +35,14 @@ def retrieval(queries):
     with open("important_text_inverted.txt", "r") as f, open("new_inverted_index.txt", "r") as g:
         for query in queries:
             if query in important_offsets:
+            #if important_offsets.get(query) is not None: 
                 pos = important_offsets[query]
                 f.seek(pos)
                 posting = eval(f.readline())
                 imp_temp_dict[posting[0]] = posting[1]
 
             if query in word_offsets:
+            #if word_offsets.get(query) is not None:
                 pos = word_offsets[query]
                 g.seek(pos)
                 posting = eval(g.readline())
@@ -50,12 +52,16 @@ def retrieval(queries):
     # temp_dict: { token1: {docid1: tfidf...}, token2: {docid2: tfidf }}
     # take the doc_id keys from the temp_dict..
     # have a set to hold it
+    '''
     temp_docids = set() 
     for key in temp_dict.values():
         for some_docid in key.keys():
             temp_docids.add(some_docid)
+    '''
 
-    temp_docids = sorted(list(temp_docids))
+    temp_docids = sorted(list({some_docid for key in temp_dict.values() for some_docid in key.keys()}))
+
+    #temp_docids = sorted(list(temp_docids))
 
     temp_dict = dict(sorted(temp_dict.items(), key=lambda x:len(x[1]))) 
 
@@ -70,7 +76,7 @@ def retrieval(queries):
                 # add important text to the score 
                 if token in imp_temp_dict:
                     if doc_id in imp_temp_dict[token]:
-                        temp_score += imp_temp_dict[token][doc_id]
+                        temp_score += imp_temp_dict[token][doc_id] * 1.50
 
                 # check to see if the document is a .txt page? lower the values for these docs because they aren't valid "websites" 
                 # below takes too much time since it searches 55k docs 
@@ -86,10 +92,15 @@ def retrieval(queries):
     # print(ret_val[0])
     # print(type(ret_val[0]))
 
+    '''
+
     url_list = []
     # retreive the actual url here 
     for temp_tuple in ret_val:
         url_list.append(docid_index[str(temp_tuple[0])])
+
+    '''
+    url_list = [docid_index[str(temp_tuple[0])] for temp_tuple in ret_val]
 
     # stop timer
     stop_time = datetime.datetime.now() 
