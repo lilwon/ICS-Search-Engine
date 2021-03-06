@@ -3,6 +3,11 @@ Milestone 1: Index construction <br>
 Milestone 2: Search Retrieval construction <br>
 Milestone 3: Working Prototype of a Search Engine <br>
 
+
+## Starting the Indexer 
+
+
+
 ## Starting up the Search Engine
 **Only do this if it's necessary** <br>
 Follow the [Flask installation page](https://flask.palletsprojects.com/en/1.1.x/installation/) 
