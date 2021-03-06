@@ -5,7 +5,10 @@ Milestone 3: Working Prototype of a Search Engine <br>
 
 
 ## Starting the Indexer 
-
+Install the following python libraries through the command prompt:<br> 
+- Beautifulsoup <br> 
+- nltk <br> 
+- flask <br> 
 
 
 
