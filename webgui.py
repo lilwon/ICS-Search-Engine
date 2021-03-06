@@ -153,6 +153,10 @@ def search_page():
         else: # keep all the stopwords :(
             check_query = stemmed_query
 
+        check_query = sorted(check_query, reverse=False)
+
+        print(check_query)
+
         results, timer = retrieval(check_query) 
 
     return render_template("search_page.html", query=queries, timer=round(timer, 2), results=results)

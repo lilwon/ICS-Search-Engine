@@ -4,46 +4,56 @@
        <meta charset="UTF-8">
        <title>Not Another ICS Search Engine</title>
    </head> 
-   <div>
-   	<h1 style="text-align:center">Informatics 141 Winter 2021 Search Engine 
-   <div>
 
    <body>
+        <div>
+   	        <h1 style="text-align: center">Informatics 141 Winter 2021 Search Engine </h1>
+        </div>
+
         <form action="http://127.0.0.1:5000/" method ="post">
-            <input type="text" name="query">
-		<span>   <button type="submit"><i class="fa fa-search"></i>Search</button>
+            <input style="display: inline-block" type="text" name="query">
+		    <span style="text-align: center">  
+                <button type="submit"><i class="fa fa-search"></i>Search</button>
+            </span>
         </form>
+
         {% for item in query %}
         <li style="display:inline">{{ item }}</li>
         {% endfor %}
 
-        <p style="font-size:25px">Timer: {{ timer }} milliseconds </p>
+        <p style="text-align: center; font-size:25px">Timer: {{ timer }} milliseconds </p>
 
-        <table border = 1>
+        <table class="center" border = 1>
             {% for item in results %}
             <tr>
                 <th> <a href="{{ item }}">{{ item }} </a></th>
             </tr>
            {% endfor %}
         </table>
-	
+
+        <div class="footer">
+            Submitted by : Bryan Snyder, Lillian Won, Matthew Olitoquit
+        </div>
    </body>
 
 
  	<style type ="text/css" >
+      body {
+          text-align: center;
+          width: 100%; 
+          height: 100%;
+      }
    	  .footer{ 
-       	      position: absolute;
+       	      position: fixed;
               text-align: right;    
               bottom: 0px; 
-	      font-size: 15px;
-              width: 100%;
+	          font-size: 15px;
            }  
+
+      .center {
+          margin-left: auto;
+          margin-right: auto;
+      }
      </style>
-     </head>
-     <body>
-         <div class="footer",style="font-size:11px">Submitted by : Bryan Snyder, Lillian Won, Matthew Olitoquit   ...</div>
-     </body>
 	
-
-
 </html>
