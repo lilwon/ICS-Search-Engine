@@ -12,7 +12,7 @@ Install the following python libraries through the command prompt:<br>
 
 
 
-The following files should be created from our indexer prior to starting the search engine:<br>
+**The following files should be created from our indexer prior to starting the search engine:** <br>
 
 1. doc_id_map.txt<br>
 2. important_text_inverted.txt<br>
@@ -25,7 +25,7 @@ The following files should be created from our indexer prior to starting the sea
 9. word_offsets.txt<br>
  
 
-
+To run the indexer (on Windows), run the command prompt and input py -3 inverted_index.py <br> 
 
 ## Starting up the Search Engine
 **Only do this if it's necessary** <br>
