@@ -4,17 +4,20 @@
        <meta charset="UTF-8">
        <title>Not Another ICS Search Engine</title>
    </head> 
+   <div>
+   	<h1 style="text-align:center">Informatics 141 Winter 2021 Search Engine 
+   <div>
 
    <body>
         <form action="http://127.0.0.1:5000/" method ="post">
             <input type="text" name="query">
+		<span>   <button type="submit"><i class="fa fa-search"></i>Search</button>
         </form>
-
         {% for item in query %}
-        <li style="display:inline" >{{ item }} </li>
+        <li style="display:inline">{{ item }}</li>
         {% endfor %}
 
-        <p>Timer: {{ timer }} milliseconds </p>
+        <p style="font-size:25px">Timer: {{ timer }} milliseconds </p>
 
         <table border = 1>
             {% for item in results %}
@@ -23,5 +26,24 @@
             </tr>
            {% endfor %}
         </table>
+	
    </body>
+
+
+ 	<style type ="text/css" >
+   	  .footer{ 
+       	      position: absolute;
+              text-align: right;    
+              bottom: 0px; 
+	      font-size: 15px;
+              width: 100%;
+           }  
+     </style>
+     </head>
+     <body>
+         <div class="footer",style="font-size:11px">Submitted by : Bryan Snyder, Lillian Won, Matthew Olitoquit   ...</div>
+     </body>
+	
+
+
 </html>
